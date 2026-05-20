@@ -9,3 +9,4 @@ coverage/
 coverage-api/
 .hf_cache/
 pgdata_dev/
+test-results/
