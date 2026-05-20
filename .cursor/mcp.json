@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "knowledge-graph": {
+      "command": "node",
+      "args": [
+        "C:/Users/caiqu/Desktop/knowledge-graph-poc/packages/mcp-server/dist/index.js"
+      ],
+      "env": {
+        "DATABASE_URL": "postgresql://kg:kg_dev_secret@localhost:5432/kg_dev",
+        "KG_WORKSPACE": "C:/Users/caiqu/Desktop/knowledge-graph-poc",
+        "EMBEDDING_PROVIDER": "hash"
+      }
+    }
+  }
+}

@@ -14,8 +14,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist",
-    "migrate:up": "node-pg-migrate up --migrations-dir migrations --migration-file-language sql",
-    "migrate:down": "node-pg-migrate down --migrations-dir migrations --migration-file-language sql",
+    "migrate:up": "node --env-file=../../.env ../../../scripts/migrate.mjs up",
+    "migrate:down": "node --env-file=../../.env ../../../scripts/migrate.mjs down",
     "migrate:create": "node-pg-migrate create --migrations-dir migrations --migration-file-language sql"
   },
   "dependencies": {
