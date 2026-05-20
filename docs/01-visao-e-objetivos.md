@@ -27,25 +27,25 @@ O sistema deve:
 
 **Saída:** `ContextPack` — conjunto estruturado e limitado em tokens, com citações aos trechos/fontes, pronto para um LLM gerar copy e estrutura da página.
 
-| Papel | Responsabilidade |
-|-------|------------------|
-| **Grafo** | Descoberta relacionada — o que mais ler além do óbvio |
-| **Embeddings** | Onde está escrito em linguagem natural |
-| **BM25** | Termos exatos — concorrentes, siglas, stack |
-| **Planner (facets)** | O que uma landing precisa conter |
+| Papel                | Responsabilidade                                      |
+| -------------------- | ----------------------------------------------------- |
+| **Grafo**            | Descoberta relacionada — o que mais ler além do óbvio |
+| **Embeddings**       | Onde está escrito em linguagem natural                |
+| **BM25**             | Termos exatos — concorrentes, siglas, stack           |
+| **Planner (facets)** | O que uma landing precisa conter                      |
 
 Ver [06-fluxo-landing-page.md](./06-fluxo-landing-page.md).
 
 ## Escopo da POC
 
-| Dentro do escopo | Fora do escopo (inicial) |
-|------------------|---------------------------|
-| Ingestão de `.md`, chunking por estrutura | OCR de PDF, crawlers web |
-| Grafo com ontologia GTM mínima | Extração LLM em escala industrial sem schema |
-| Híbrido: embeddings + BM25 + RRF | Fine-tuning de embeddings |
-| Expansão 1–2 hops no grafo | Raciocínio multi-hop complexo (GraphRAG completo) |
-| Servidor MCP com tools essenciais | UI administrativa |
-| Caso landing como validação | Outros templates (email, pitch deck) — fase 2 |
+| Dentro do escopo                          | Fora do escopo (inicial)                          |
+| ----------------------------------------- | ------------------------------------------------- |
+| Ingestão de `.md`, chunking por estrutura | OCR de PDF, crawlers web                          |
+| Grafo com ontologia GTM mínima            | Extração LLM em escala industrial sem schema      |
+| Híbrido: embeddings + BM25 + RRF          | Fine-tuning de embeddings                         |
+| Expansão 1–2 hops no grafo                | Raciocínio multi-hop complexo (GraphRAG completo) |
+| Servidor MCP com tools essenciais         | UI administrativa                                 |
+| Caso landing como validação               | Outros templates (email, pitch deck) — fase 2     |
 
 ## Princípios de design
 

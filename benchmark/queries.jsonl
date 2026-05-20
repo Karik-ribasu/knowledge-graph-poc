@@ -1,0 +1,18 @@
+{"query":"Qual é a proposta de valor do NexusFlow para equipes de revenue?","expected_paths":["corpus/business/visao-produto.md","corpus/business/proposta-valor.md"],"facet":"positioning"}
+{"query":"Quem é a persona principal do produto NexusFlow?","expected_paths":["corpus/market/persona-revenue-ops.md","corpus/business/icp-enterprise.md"],"facet":"persona"}
+{"query":"Quais dores de compliance e conhecimento a persona enfrenta?","expected_paths":["corpus/market/persona-revenue-ops.md","corpus/business/dores-icp.md"],"facet":"pain"}
+{"query":"Como o NexusFlow se diferencia de wikis tradicionais e RAG genérico?","expected_paths":["corpus/business/diferenciacao.md","corpus/market/competidores.md"],"facet":"differentiation"}
+{"query":"Existem cases ou métricas de prova social do NexusFlow?","expected_paths":["corpus/market/cases-clientes.md","corpus/business/metricas-sucesso.md"],"facet":"proof"}
+{"query":"Qual é o modelo de precificação e planos do NexusFlow?","expected_paths":["corpus/business/pricing.md","corpus/market/segmentos-precificacao.md"],"facet":"pricing"}
+{"query":"Qual stack técnica e banco de dados o NexusFlow utiliza?","expected_paths":["corpus/technical/arquitetura.md","corpus/technical/postgres-pgvector.md"],"facet":"technical"}
+{"query":"Quem são os principais concorrentes citados no mercado?","expected_paths":["corpus/market/competidores.md","corpus/market/analise-gartner.md"],"facet":"competitive"}
+{"query":"Como funciona o onboarding de um novo workspace no NexusFlow?","expected_paths":["corpus/technical/onboarding-workspace.md","corpus/business/jornada-implementacao.md"],"facet":"onboarding"}
+{"query":"O que é o Context Pack e para que serve na landing page?","expected_paths":["corpus/technical/context-pack.md","corpus/business/caso-uso-landing.md"],"facet":"positioning"}
+{"query":"Quais integrações MCP o produto oferece para o Cursor?","expected_paths":["corpus/technical/integracao-mcp.md","corpus/technical/servidor-mcp.md"],"facet":"technical"}
+{"query":"Qual tom de voz usar em materiais para CTOs?","expected_paths":["corpus/market/tom-voz-ctos.md","corpus/business/brand-guidelines.md"],"facet":"persona"}
+{"query":"Quais features do plano Enterprise incluem SSO e auditoria?","expected_paths":["corpus/business/pricing.md","corpus/technical/seguranca-enterprise.md"],"facet":"pricing"}
+{"query":"Como o retrieval híbrido combina BM25 e embeddings?","expected_paths":["corpus/technical/retrieval-hibrido.md","corpus/technical/postgres-pgvector.md"],"facet":"technical"}
+{"query":"Qual o tamanho do mercado TAM para knowledge ops em B2B SaaS?","expected_paths":["corpus/market/tam-sam-som.md","corpus/market/tendencias-2025.md"],"facet":"competitive"}
+{"query":"Quais benefícios o módulo de grafo GTM entrega para vendas?","expected_paths":["corpus/business/modulo-grafo-gtm.md","corpus/market/persona-vendas.md"],"facet":"differentiation"}
+{"query":"Roadmap público: o que está previsto para Q3?","expected_paths":["corpus/business/roadmap.md","corpus/technical/roadmap-tecnico.md"],"facet":"general"}
+{"query":"Requisitos mínimos de infra para self-hosted?","expected_paths":["corpus/technical/requisitos-infra.md","corpus/technical/arquitetura.md"],"facet":"technical"}

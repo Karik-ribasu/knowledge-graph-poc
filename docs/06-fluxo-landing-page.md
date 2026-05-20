@@ -16,13 +16,13 @@ Caso de uso de referência que valida o desenho do sistema: da documentação di
 }
 ```
 
-| Campo | Exemplo |
-|-------|---------|
-| `product` | Nome da oferta / produto |
-| `persona` | "CTO enterprise", "SMB founder" |
-| `goal` | "Conversão trial", "Agendar demo" |
-| `tone` | "Confiante, técnico-leve" |
-| `constraints` | "Não mencionar preço", "PT-BR" |
+| Campo         | Exemplo                           |
+| ------------- | --------------------------------- |
+| `product`     | Nome da oferta / produto          |
+| `persona`     | "CTO enterprise", "SMB founder"   |
+| `goal`        | "Conversão trial", "Agendar demo" |
+| `tone`        | "Confiante, técnico-leve"         |
+| `constraints` | "Não mencionar preço", "PT-BR"    |
 
 ---
 
@@ -30,15 +30,15 @@ Caso de uso de referência que valida o desenho do sistema: da documentação di
 
 O planner decompõe o brief em **sub-queries** (não uma busca monolítica).
 
-| Facet | Sub-queries exemplo |
-|-------|---------------------|
-| `positioning` | proposta de valor, posicionamento para {persona} |
-| `audience_pains` | dores, jobs-to-be-done {persona} |
-| `differentiation` | vs concorrentes, diferenciais |
-| `features_benefits` | features que endereçam dores |
-| `proof` | métricas, cases, credibilidade |
-| `objections` | objeções comuns e respostas |
-| `technical_credibility` | segurança, stack (se landing dev-facing) |
+| Facet                   | Sub-queries exemplo                              |
+| ----------------------- | ------------------------------------------------ |
+| `positioning`           | proposta de valor, posicionamento para {persona} |
+| `audience_pains`        | dores, jobs-to-be-done {persona}                 |
+| `differentiation`       | vs concorrentes, diferenciais                    |
+| `features_benefits`     | features que endereçam dores                     |
+| `proof`                 | métricas, cases, credibilidade                   |
+| `objections`            | objeções comuns e respostas                      |
+| `technical_credibility` | segurança, stack (se landing dev-facing)         |
 
 Por facet: executar pipeline de [05-retrieval-hibrido.md](./05-retrieval-hibrido.md).
 
@@ -82,9 +82,7 @@ sequenceDiagram
   "sections": {
     "positioning": {
       "content": "",
-      "citations": [
-        { "chunk_id": "", "path": "", "heading": "" }
-      ]
+      "citations": [{ "chunk_id": "", "path": "", "heading": "" }]
     },
     "audience_pains": {
       "content": "",
@@ -122,10 +120,10 @@ sequenceDiagram
 
 ## 5. Budget de tokens
 
-| Regra | Valor sugerido |
-|-------|----------------|
-| Pack total | 4k–8k tokens |
-| Por seção | Proporcional à importância da facet para o `goal` |
+| Regra            | Valor sugerido                                               |
+| ---------------- | ------------------------------------------------------------ |
+| Pack total       | 4k–8k tokens                                                 |
+| Por seção        | Proporcional à importância da facet para o `goal`            |
 | Prioridade baixa | `technical_credibility` omitível se brief não for dev-facing |
 
 ---
@@ -143,12 +141,12 @@ sequenceDiagram
 
 ## 7. Armadilhas conhecidas
 
-| Problema | Mitigação |
-|----------|-----------|
-| Retrieval traz só arquitetura técnica | Filtro `doc_type`; whitelist de arestas na expansão |
-| Chunks redundantes entre facets | Dedup global ao montar o pack |
-| Contradição entre docs de negócio | Fase 3: aresta `contradicts`; na POC, priorizar doc mais recente |
-| Query única "landing page" | Sempre usar planner de facets |
+| Problema                              | Mitigação                                                        |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| Retrieval traz só arquitetura técnica | Filtro `doc_type`; whitelist de arestas na expansão              |
+| Chunks redundantes entre facets       | Dedup global ao montar o pack                                    |
+| Contradição entre docs de negócio     | Fase 3: aresta `contradicts`; na POC, priorizar doc mais recente |
+| Query única "landing page"            | Sempre usar planner de facets                                    |
 
 ---
 

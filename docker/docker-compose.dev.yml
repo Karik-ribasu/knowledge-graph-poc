@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: kg-postgres-dev
+    environment:
+      POSTGRES_USER: kg
+      POSTGRES_PASSWORD: kg_dev_secret
+      POSTGRES_DB: kg_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kg -d kg_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: kg-app-dev
+    profiles:
+      - app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kg:kg_dev_secret@postgres:5432/kg_dev
+      KG_WORKSPACE: /app/corpus
+      EMBEDDING_PROVIDER: transformers
+      NODE_ENV: development
+    volumes:
+      - ../corpus:/app/corpus:ro
+      - hf_cache:/root/.cache/huggingface
+    working_dir: /app
+
+  # MCP stdio is normally run on the host (Cursor mcp.json). Optional profile for container smoke tests.
+  mcp:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: kg-mcp-dev
+    profiles:
+      - mcp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kg:kg_dev_secret@postgres:5432/kg_dev
+      KG_WORKSPACE: /app
+      EMBEDDING_PROVIDER: hash
+      NODE_ENV: development
+    volumes:
+      - ..:/app
+      - ../corpus:/app/corpus:ro
+    working_dir: /app
+    stdin_open: true
+    tty: false
+    command: ["node", "packages/mcp-server/dist/index.js"]
+
+volumes:
+  pgdata_dev:
+  hf_cache:

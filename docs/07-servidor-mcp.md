@@ -18,23 +18,23 @@ O core deve ser testável via CLI sem MCP.
 
 ## 2. Tools (POC)
 
-| Tool | Descrição | Parâmetros principais |
-|------|-----------|------------------------|
-| `sync_workspace` | Reindexa diretório configurado | `path` (opcional) |
-| `hybrid_search` | RRF sobre vetor + BM25 | `query`, `filters`, `limit` |
-| `get_entity` | Detalhe de nó + vizinhança | `entity_id`, `include_neighbors` |
-| `expand_graph` | Expansão a partir de entidades | `entity_ids`, `hops`, `edge_types` |
-| `get_chunk` | Texto + proveniência | `chunk_id` |
-| `plan_landing_context` | Brief → ContextPack | `brief` (objeto) |
+| Tool                   | Descrição                      | Parâmetros principais              |
+| ---------------------- | ------------------------------ | ---------------------------------- |
+| `sync_workspace`       | Reindexa diretório configurado | `path` (opcional)                  |
+| `hybrid_search`        | RRF sobre vetor + BM25         | `query`, `filters`, `limit`        |
+| `get_entity`           | Detalhe de nó + vizinhança     | `entity_id`, `include_neighbors`   |
+| `expand_graph`         | Expansão a partir de entidades | `entity_ids`, `hops`, `edge_types` |
+| `get_chunk`            | Texto + proveniência           | `chunk_id`                         |
+| `plan_landing_context` | Brief → ContextPack            | `brief` (objeto)                   |
 
 ---
 
 ## 3. Resources (read-only)
 
-| URI | Conteúdo |
-|-----|----------|
+| URI           | Conteúdo                                                                           |
+| ------------- | ---------------------------------------------------------------------------------- |
 | `kg://schema` | Ontologia: tipos de nó e aresta ([04-ontologia-grafo.md](./04-ontologia-grafo.md)) |
-| `kg://stats` | Contagem de documentos, chunks, nós por tipo |
+| `kg://stats`  | Contagem de documentos, chunks, nós por tipo                                       |
 
 ---
 
@@ -96,11 +96,11 @@ O core deve ser testável via CLI sem MCP.
 
 Variáveis de ambiente esperadas (a definir na implementação):
 
-| Variável | Uso |
-|----------|-----|
-| `KG_WORKSPACE` | Raiz dos `.md` |
-| `KG_DB_URL` | Conexão ao store (se aplicável) |
-| `OPENAI_API_KEY` / similar | Embeddings (se cloud) |
+| Variável                   | Uso                             |
+| -------------------------- | ------------------------------- |
+| `KG_WORKSPACE`             | Raiz dos `.md`                  |
+| `KG_DB_URL`                | Conexão ao store (se aplicável) |
+| `OPENAI_API_KEY` / similar | Embeddings (se cloud)           |
 
 ---
 

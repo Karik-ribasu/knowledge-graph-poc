@@ -1,0 +1,51 @@
+networks:
+  kg-test:
+    name: kg-test
+    driver: bridge
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: kg-postgres-test
+    networks:
+      - kg-test
+    environment:
+      POSTGRES_USER: kg
+      POSTGRES_PASSWORD: kg_test_secret
+      POSTGRES_DB: kg_test
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kg -d kg_test"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  test:
+    image: node:22-bookworm-slim
+    container_name: kg-test-runner
+    working_dir: /app
+    networks:
+      - kg-test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kg:kg_test_secret@postgres:5432/kg_test
+      KG_WORKSPACE: /app
+      KG_TEST_USE_EXTERNAL_DB: "1"
+      EMBEDDING_PROVIDER: hash
+      NODE_ENV: test
+    volumes:
+      - ..:/app
+    command:
+      - bash
+      - -lc
+      - |
+        set -euo pipefail
+        corepack enable && corepack prepare pnpm@9.15.0 --activate
+        pnpm install --frozen-lockfile || pnpm install
+        pnpm build
+        pnpm test
+        pnpm test:coverage
+        pnpm test:integration

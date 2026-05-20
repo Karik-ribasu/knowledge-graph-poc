@@ -43,15 +43,15 @@ flowchart TB
 
 ## 2. Componentes
 
-| Camada | Responsabilidade |
-|--------|------------------|
-| **Ingestão** | Watch/sync, parse MD, chunking, extração de entidades/links, upsert nos stores |
-| **Graph Store** | Nós, arestas, queries de vizinhança |
-| **Vector Store** | Embeddings de chunks, similarity search |
-| **Lexical Index** | BM25 / FTS sobre texto de chunks |
-| **Retrieval Orchestrator** | RRF, dedup, filtros (`doc_type`, tags) |
-| **Context Pack Builder** | Planner de facets + montagem do pack |
-| **MCP Adapter** | JSON-RPC, schemas, auth |
+| Camada                     | Responsabilidade                                                               |
+| -------------------------- | ------------------------------------------------------------------------------ |
+| **Ingestão**               | Watch/sync, parse MD, chunking, extração de entidades/links, upsert nos stores |
+| **Graph Store**            | Nós, arestas, queries de vizinhança                                            |
+| **Vector Store**           | Embeddings de chunks, similarity search                                        |
+| **Lexical Index**          | BM25 / FTS sobre texto de chunks                                               |
+| **Retrieval Orchestrator** | RRF, dedup, filtros (`doc_type`, tags)                                         |
+| **Context Pack Builder**   | Planner de facets + montagem do pack                                           |
+| **MCP Adapter**            | JSON-RPC, schemas, auth                                                        |
 
 ---
 

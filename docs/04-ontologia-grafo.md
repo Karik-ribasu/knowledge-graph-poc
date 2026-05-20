@@ -6,49 +6,49 @@ Modelo mínimo para suportar discovery de conteúdo para síntese (landing page 
 
 ## 1. Tipos de nó
 
-| Tipo | Descrição | Propriedades exemplo |
-|------|-----------|----------------------|
-| `Document` | Arquivo `.md` | `path`, `doc_type`, `updated_at` |
-| `Section` | Bloco sob heading | `heading`, `level` |
-| `Chunk` | Unidade de indexação | `text`, `token_count`, `chunk_id` |
-| `Product` | Oferta / produto | `name` |
-| `Persona` | Público-alvo | `name`, `segment` |
-| `PainPoint` | Dor do cliente | `label` |
-| `Feature` | Capacidade do produto | `name` |
-| `Benefit` | Resultado para o cliente | `label` |
-| `Competitor` | Concorrente | `name` |
-| `Claim` | Afirmação / prova | `text`, `metric` |
-| `StackComponent` | Tech da stack padrão | `name`, `category` |
+| Tipo             | Descrição                | Propriedades exemplo              |
+| ---------------- | ------------------------ | --------------------------------- |
+| `Document`       | Arquivo `.md`            | `path`, `doc_type`, `updated_at`  |
+| `Section`        | Bloco sob heading        | `heading`, `level`                |
+| `Chunk`          | Unidade de indexação     | `text`, `token_count`, `chunk_id` |
+| `Product`        | Oferta / produto         | `name`                            |
+| `Persona`        | Público-alvo             | `name`, `segment`                 |
+| `PainPoint`      | Dor do cliente           | `label`                           |
+| `Feature`        | Capacidade do produto    | `name`                            |
+| `Benefit`        | Resultado para o cliente | `label`                           |
+| `Competitor`     | Concorrente              | `name`                            |
+| `Claim`          | Afirmação / prova        | `text`, `metric`                  |
+| `StackComponent` | Tech da stack padrão     | `name`, `category`                |
 
 ---
 
 ## 2. Tipos de aresta
 
-| Aresta | De → Para | Origem típica |
-|--------|-----------|---------------|
-| `contains` | Document → Section → Chunk | Parse estrutural |
-| `mentions` | Chunk → Entity | NER / regex / LLM com schema |
-| `citedIn` | Entity → Chunk | Inverso de `mentions` |
-| `targets` | Product → Persona | Docs de negócio |
-| `hasPain` | Persona → PainPoint | Pesquisa de mercado |
-| `addressedBy` | PainPoint → Feature | Negócio + técnico |
-| `enables` | Feature → Benefit | Negócio |
-| `implementedWith` | Feature → StackComponent | Docs técnicos |
-| `competesWith` | Product → Competitor | Mercado |
-| `supports` | Claim → Benefit | Métricas, cases |
-| `contradicts` | Claim → Claim | Fase 2 — detecção manual ou LLM |
-| `linksTo` | Document → Document | Wikilinks `[[...]]` |
+| Aresta            | De → Para                  | Origem típica                   |
+| ----------------- | -------------------------- | ------------------------------- |
+| `contains`        | Document → Section → Chunk | Parse estrutural                |
+| `mentions`        | Chunk → Entity             | NER / regex / LLM com schema    |
+| `citedIn`         | Entity → Chunk             | Inverso de `mentions`           |
+| `targets`         | Product → Persona          | Docs de negócio                 |
+| `hasPain`         | Persona → PainPoint        | Pesquisa de mercado             |
+| `addressedBy`     | PainPoint → Feature        | Negócio + técnico               |
+| `enables`         | Feature → Benefit          | Negócio                         |
+| `implementedWith` | Feature → StackComponent   | Docs técnicos                   |
+| `competesWith`    | Product → Competitor       | Mercado                         |
+| `supports`        | Claim → Benefit            | Métricas, cases                 |
+| `contradicts`     | Claim → Claim              | Fase 2 — detecção manual ou LLM |
+| `linksTo`         | Document → Document        | Wikilinks `[[...]]`             |
 
 ---
 
 ## 3. Fases de riqueza do grafo
 
-| Fase | O que construir | Valor |
-|------|-----------------|-------|
+| Fase   | O que construir                                       | Valor                               |
+| ------ | ----------------------------------------------------- | ----------------------------------- |
 | **P0** | `Document`, `Section`, `Chunk`, `contains`, `linksTo` | Proveniência + navegação entre docs |
-| **P1** | Entidades via frontmatter + headings + wikilinks | Grafo útil sem LLM pesado |
-| **P2** | Extração assistida (LLM + JSON schema fixo) para GTM | Relações `hasPain`, `enables`, etc. |
-| **P3** | `contradicts`, pesos, versionamento | Consistência em corpus vivo |
+| **P1** | Entidades via frontmatter + headings + wikilinks      | Grafo útil sem LLM pesado           |
+| **P2** | Extração assistida (LLM + JSON schema fixo) para GTM  | Relações `hasPain`, `enables`, etc. |
+| **P3** | `contradicts`, pesos, versionamento                   | Consistência em corpus vivo         |
 
 ---
 

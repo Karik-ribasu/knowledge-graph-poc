@@ -1,0 +1,54 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parseMarkdown > parses fixture into structural AST (snapshot) 1`] = `
+{
+  "allWikilinkTargets": [
+    "target-doc",
+    "other-doc",
+  ],
+  "codeBlockCount": 2,
+  "docType": "business",
+  "frontmatterKeys": [
+    "audience",
+    "doc_type",
+    "tags",
+    "title",
+  ],
+  "preambleLength": 41,
+  "relativePath": "corpus/business/sample.md",
+  "sectionHeadings": [
+    {
+      "bodyPreview": "Body text about **value** and [[other-do",
+      "codeBlockLanguages": [],
+      "heading": "First Section",
+      "level": 2,
+      "ordinal": 0,
+      "wikilinkTargets": [
+        "other-doc",
+      ],
+    },
+    {
+      "bodyPreview": "Nested content here.",
+      "codeBlockLanguages": [],
+      "heading": "Sub Section",
+      "level": 3,
+      "ordinal": 1,
+      "wikilinkTargets": [],
+    },
+    {
+      "bodyPreview": "More prose for chunking tests.
+
+
+Final l",
+      "codeBlockLanguages": [
+        "bash",
+      ],
+      "heading": "Second Section",
+      "level": 2,
+      "ordinal": 2,
+      "wikilinkTargets": [],
+    },
+  ],
+  "title": "Sample Doc",
+}
+`;

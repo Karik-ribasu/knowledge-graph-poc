@@ -6,12 +6,12 @@ Glossário dos conceitos usados neste projeto e como se relacionam.
 
 ## Corpus e documentos
 
-| Conceito | Definição |
-|----------|-----------|
-| **Documento** | Um arquivo `.md` com identificador estável (`doc_id`, path). |
-| **Corpus** | Conjunto de documentos ingeridos. |
-| **Frontmatter** | Metadados YAML no topo do MD (`tags`, `type`, `audience`) — viram propriedades de nós. |
-| **Proveniência** | Rastreio `chunk → section → document → path` para citações e auditoria. |
+| Conceito         | Definição                                                                              |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| **Documento**    | Um arquivo `.md` com identificador estável (`doc_id`, path).                           |
+| **Corpus**       | Conjunto de documentos ingeridos.                                                      |
+| **Frontmatter**  | Metadados YAML no topo do MD (`tags`, `type`, `audience`) — viram propriedades de nós. |
+| **Proveniência** | Rastreio `chunk → section → document → path` para citações e auditoria.                |
 
 ---
 
@@ -19,12 +19,12 @@ Glossário dos conceitos usados neste projeto e como se relacionam.
 
 Texto longo é dividido em **chunks** para indexação e retrieval.
 
-| Regra | Motivo |
-|-------|--------|
-| Preferir limites em `##` / `###` | Preserva contexto semântico e títulos para BM25 |
-| Tamanho alvo ~200–800 tokens | Balanceia precisão do embedding e granularidade |
-| Overlap pequeno (ex.: 10–15%) | Evita cortar frases críticas na fronteira |
-| Blocos de código separados | Stack docs: retrieval técnico sem misturar narrativa de negócio |
+| Regra                            | Motivo                                                          |
+| -------------------------------- | --------------------------------------------------------------- |
+| Preferir limites em `##` / `###` | Preserva contexto semântico e títulos para BM25                 |
+| Tamanho alvo ~200–800 tokens     | Balanceia precisão do embedding e granularidade                 |
+| Overlap pequeno (ex.: 10–15%)    | Evita cortar frases críticas na fronteira                       |
+| Blocos de código separados       | Stack docs: retrieval técnico sem misturar narrativa de negócio |
 
 Cada chunk é unidade de indexação nos índices **vetorial** e **BM25**.
 
@@ -70,7 +70,7 @@ No nosso domínio (negócio + mercado + técnico), BM25 é **complementar**, nã
 Fusão de **listas ranqueadas** sem normalizar scores entre retrievers:
 
 \[
-\text{score}(d) = \sum_i \frac{1}{k + \text{rank}_i(d)}
+\text{score}(d) = \sum_i \frac{1}{k + \text{rank}\_i(d)}
 \]
 
 - Constante **k** padrão: **60**.

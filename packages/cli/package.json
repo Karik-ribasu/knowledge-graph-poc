@@ -1,0 +1,42 @@
+{
+  "name": "@kg/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "kg": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./wiring": {
+      "types": "./dist/wiring.d.ts",
+      "import": "./dist/wiring.js"
+    },
+    "./embedding-provider": {
+      "types": "./dist/embedding-provider.d.ts",
+      "import": "./dist/embedding-provider.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "benchmark:recall": "node dist/benchmark-recall.js"
+  },
+  "dependencies": {
+    "@kg/adapter-embeddings-openai": "workspace:*",
+    "@kg/adapter-embeddings-transformers": "workspace:*",
+    "@kg/adapter-postgres": "workspace:*",
+    "@kg/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "^10.16.0",
+    "testcontainers": "^10.16.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

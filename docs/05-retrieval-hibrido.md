@@ -18,30 +18,30 @@ flowchart LR
   Exp --> Out[Chunks + entidades]
 ```
 
-| Etapa | Descrição |
-|-------|-----------|
-| 1 | Query (ou sub-query do planner) |
-| 2 | **Dense:** top `N_dense` (ex.: 50) |
-| 3 | **BM25:** top `N_lex` (ex.: 50) |
-| 4 | **RRF** → top `K_rrf` (ex.: 20) |
-| 5 | **Dedup** por `doc_id` / similaridade (MMR opcional) |
-| 6 | **Extrair sementes:** entidades nos chunks |
-| 7 | **Expandir grafo:** 1–2 hops com whitelist de arestas |
-| 8 | Anexar chunks de nós alcançados |
+| Etapa | Descrição                                             |
+| ----- | ----------------------------------------------------- |
+| 1     | Query (ou sub-query do planner)                       |
+| 2     | **Dense:** top `N_dense` (ex.: 50)                    |
+| 3     | **BM25:** top `N_lex` (ex.: 50)                       |
+| 4     | **RRF** → top `K_rrf` (ex.: 20)                       |
+| 5     | **Dedup** por `doc_id` / similaridade (MMR opcional)  |
+| 6     | **Extrair sementes:** entidades nos chunks            |
+| 7     | **Expandir grafo:** 1–2 hops com whitelist de arestas |
+| 8     | Anexar chunks de nós alcançados                       |
 
 ---
 
 ## 2. Reciprocal Rank Fusion (RRF)
 
 \[
-\text{score}(d) = \sum_i \frac{1}{k + \text{rank}_i(d)}
+\text{score}(d) = \sum_i \frac{1}{k + \text{rank}\_i(d)}
 \]
 
-| Parâmetro | Valor inicial (POC) | Nota |
-|-----------|---------------------|------|
-| `k` | 60 | Literatura clássica |
-| `N_dense`, `N_lex` | 50 | Por canal |
-| `K_rrf` | 20 | Saída para expansão/pack |
+| Parâmetro          | Valor inicial (POC) | Nota                     |
+| ------------------ | ------------------- | ------------------------ |
+| `k`                | 60                  | Literatura clássica      |
+| `N_dense`, `N_lex` | 50                  | Por canal                |
+| `K_rrf`            | 20                  | Saída para expansão/pack |
 
 **Por que RRF:** não exige normalizar score de similaridade coseno com score BM25.
 
@@ -49,11 +49,11 @@ flowchart LR
 
 ## 3. Parâmetros de chunking (ingestão)
 
-| Parâmetro | Valor inicial |
-|-----------|---------------|
-| Tamanho alvo | ~400 tokens |
-| Overlap | 10% |
-| Limites | Headings `##` / `###` |
+| Parâmetro    | Valor inicial         |
+| ------------ | --------------------- |
+| Tamanho alvo | ~400 tokens           |
+| Overlap      | 10%                   |
+| Limites      | Headings `##` / `###` |
 
 ---
 
@@ -61,11 +61,11 @@ flowchart LR
 
 Aplicáveis em dense, BM25 e/ou pós-RRF:
 
-| Filtro | Uso |
-|--------|-----|
+| Filtro     | Uso                                   |
+| ---------- | ------------------------------------- |
 | `doc_type` | `business` \| `market` \| `technical` |
-| `audience` | Frontmatter — alinhar ao brief |
-| `tags` | Subconjuntos temáticos |
+| `audience` | Frontmatter — alinhar ao brief        |
+| `tags`     | Subconjuntos temáticos                |
 
 **Landing B2C:** limitar ou excluir expansão via `StackComponent` salvo brief dev-facing.
 
@@ -75,10 +75,10 @@ Aplicáveis em dense, BM25 e/ou pós-RRF:
 
 **Recomendação para a POC:** o grafo **não** entra no score do RRF.
 
-| Sinal | Papel |
-|-------|-------|
+| Sinal              | Papel                                              |
+| ------------------ | -------------------------------------------------- |
 | Dense + BM25 + RRF | Ranquear chunks por relevância textual à sub-query |
-| Expansão no grafo | Cobertura de facets e conceitos ligados |
+| Expansão no grafo  | Cobertura de facets e conceitos ligados            |
 
 Isso evita misturar ranks incompatíveis e mantém o grafo focado em **navegação estruturada**.
 
@@ -100,10 +100,10 @@ Evitar na expansão padrão (salvo filtro explícito):
 
 Problema: vários chunks do mesmo doc ranqueiam alto após RRF.
 
-| Técnica | Ação |
-|---------|------|
-| Dedup por `doc_id` | Máximo N chunks por documento no top K |
-| MMR (opcional) | Diversificar por similaridade entre chunks selecionados |
+| Técnica            | Ação                                                    |
+| ------------------ | ------------------------------------------------------- |
+| Dedup por `doc_id` | Máximo N chunks por documento no top K                  |
+| MMR (opcional)     | Diversificar por similaridade entre chunks selecionados |
 
 ---
 

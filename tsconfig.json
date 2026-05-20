@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/adapter-postgres" },
+    { "path": "./packages/adapter-embeddings-transformers" },
+    { "path": "./packages/adapter-embeddings-openai" },
+    { "path": "./packages/cli" },
+    { "path": "./packages/mcp-server" }
+  ]
+}
