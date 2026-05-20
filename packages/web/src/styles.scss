@@ -1,0 +1,27 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+:root {
+  --kg-border: #e2e8f0;
+  --kg-surface: #f8fafc;
+  --kg-document: #3b82f6;
+  --kg-section: #93c5fd;
+  --kg-chunk: #cbd5e1;
+  --kg-product: #8b5cf6;
+  --kg-competitor: #ef4444;
+  --kg-persona: #f59e0b;
+  --kg-feature: #10b981;
+  --kg-edge-contains: #94a3b8;
+  --kg-edge-links: #2563eb;
+  --kg-edge-mentions: #a855f7;
+  --kg-edge-competes: #dc2626;
+}

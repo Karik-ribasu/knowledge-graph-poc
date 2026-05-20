@@ -68,3 +68,62 @@ jobs:
 
       - name: Integration tests (Testcontainers)
         run: pnpm test:integration
+
+  explorer:
+    runs-on: ubuntu-latest
+    needs: integration
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Build Graph Explorer (api + web)
+        run: pnpm explorer:build
+
+      - name: Explorer unit tests (api, core, adapter)
+        run: >
+          pnpm exec vitest run --project unit
+          packages/api
+          packages/core/src/explorer
+          packages/adapter-postgres/src/repositories/graph-read-repository.test.ts
+
+      - name: Explorer integration tests (api, graph-read)
+        run: >
+          pnpm exec vitest run --project integration
+          packages/api
+          packages/adapter-postgres/src/graph-read.integration.test.ts
+
+      - name: API coverage (≥80% lines)
+        run: pnpm test:coverage:api
+
+      - name: Web unit tests (Karma / ChromeHeadless)
+        run: pnpm --filter @kg/web run test
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter @kg/web exec playwright install chromium --with-deps
+
+      - name: Playwright smoke (toolbar + filtros; web dev server)
+        env:
+          CI: "true"
+        run: |
+          pnpm --filter @kg/web run start &
+          WEB_PID=$!
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:4200 >/dev/null; then break; fi
+            sleep 2
+          done
+          pnpm --filter @kg/web exec playwright test e2e/graph-explorer.smoke.spec.ts -g "page loads"
+          kill $WEB_PID || true

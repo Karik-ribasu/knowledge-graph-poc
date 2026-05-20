@@ -145,3 +145,34 @@ export {
   DEFAULT_EXPANSION_HOPS,
   type PackBuilderOptions,
 } from "./context-pack/pack-builder.js";
+
+export type {
+  GraphReadPort,
+  NodeDetailPort,
+  GraphSnapshotFilters,
+  GraphSearchHit,
+} from "./ports/graph-read.js";
+
+export {
+  graphNodeDtoSchema,
+  graphLinkDtoSchema,
+  graphSnapshotDtoSchema,
+  nodeDetailDtoSchema,
+  graphQuerySchema,
+  searchQuerySchema,
+  type GraphNodeDTO,
+  type GraphLinkDTO,
+  type GraphSnapshotDTO,
+  type NodeDetailDTO,
+} from "./explorer/schemas.js";
+
+export {
+  DEFAULT_NODE_VAL_K,
+  nodeColor,
+  edgeColor,
+  isDashedEdge,
+  computeNodeVal,
+  computeLinkWidth,
+  decorateNode,
+  decorateLink,
+} from "./explorer/graph-theme.js";

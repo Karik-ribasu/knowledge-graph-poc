@@ -18,7 +18,13 @@
     "migrate:up": "pnpm --filter @kg/adapter-postgres run build && node --env-file=.env scripts/migrate.mjs up",
     "migrate:down": "pnpm --filter @kg/adapter-postgres run build && node --env-file=.env scripts/migrate.mjs down",
     "benchmark:recall": "pnpm build && node --env-file=.env packages/cli/dist/benchmark-recall.js",
-    "kg": "node --env-file=.env packages/cli/dist/index.js"
+    "kg": "node --env-file=.env packages/cli/dist/index.js",
+    "explorer:api": "pnpm --filter @kg/api run build && node --env-file=.env packages/api/dist/index.js",
+    "explorer:web": "pnpm --filter @kg/web run start",
+    "explorer:build": "pnpm --filter @kg/api run build && pnpm --filter @kg/web run build",
+    "explorer:up": "docker compose -f docker/docker-compose.dev.yml --profile explorer up -d",
+    "test:coverage:api": "vitest run --config packages/api/vitest.config.ts --coverage && node scripts/verify-api-coverage.mjs",
+    "test:explorer": "vitest run --project unit packages/api packages/core/src/explorer packages/adapter-postgres/src/repositories/graph-read-repository.test.ts && vitest run --project integration packages/api packages/adapter-postgres/src/graph-read.integration.test.ts && pnpm --filter @kg/web run test && pnpm --filter @kg/web run e2e"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

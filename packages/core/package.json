@@ -9,6 +9,22 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./explorer/graph-theme": {
+      "types": "./dist/explorer/graph-theme.d.ts",
+      "import": "./dist/explorer/graph-theme.js"
+    },
+    "./explorer/schemas": {
+      "types": "./dist/explorer/schemas.d.ts",
+      "import": "./dist/explorer/schemas.js"
+    },
+    "./graph/ontology": {
+      "types": "./dist/graph/ontology.d.ts",
+      "import": "./dist/graph/ontology.js"
+    },
+    "./ports/graph-read": {
+      "types": "./dist/ports/graph-read.d.ts",
+      "import": "./dist/ports/graph-read.js"
     }
   },
   "scripts": {

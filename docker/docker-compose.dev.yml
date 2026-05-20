@@ -60,6 +60,45 @@ services:
     tty: false
     command: ["node", "packages/mcp-server/dist/index.js"]
 
+  kg-api:
+    image: node:22-bookworm-slim
+    container_name: kg-api-dev
+    profiles:
+      - explorer
+    working_dir: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kg:kg_dev_secret@postgres:5432/kg_dev
+      API_PORT: "3001"
+      GRAPH_MAX_NODES: "300"
+      GRAPH_MAX_EDGES: "600"
+      CORS_ORIGIN: http://localhost:4200
+      NODE_ENV: development
+    ports:
+      - "3001:3001"
+    volumes:
+      - ..:/app
+    command: ["sh", "-c", "corepack enable && pnpm install && pnpm --filter @kg/api run build && node --env-file=/app/.env packages/api/dist/index.js"]
+
+  kg-web:
+    image: node:22-bookworm-slim
+    container_name: kg-web-dev
+    profiles:
+      - explorer
+    working_dir: /app
+    depends_on:
+      - kg-api
+    environment:
+      NG_APP_API_URL: http://localhost:3001/api/v1
+      NODE_ENV: development
+    ports:
+      - "4200:4200"
+    volumes:
+      - ..:/app
+    command: ["sh", "-c", "corepack enable && pnpm install && pnpm --filter @kg/web run start"]
+
 volumes:
   pgdata_dev:
   hf_cache:

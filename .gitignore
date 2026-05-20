@@ -1,9 +1,11 @@
 node_modules/
 dist/
+.angular/
 .env
 .env.local
 *.log
 .DS_Store
 coverage/
+coverage-api/
 .hf_cache/
 pgdata_dev/

@@ -15,6 +15,7 @@ Documentação viva do projeto: grafo de conhecimento alimentado por Markdown, r
 | [07-servidor-mcp.md](./07-servidor-mcp.md)                     | Tools, resources, contratos                                     |
 | [08-plano-poc.md](./08-plano-poc.md)                           | Fases, entregáveis, métricas, riscos                            |
 | [09-decisoes-stack.md](./09-decisoes-stack.md)                 | TypeScript, Postgres+pgvector, BGE-M3, alternativas descartadas |
+| [10-explorador-grafo.md](./10-explorador-grafo.md)             | Graph Explorer — UX, API REST, testes e QA manual               |
 
 ## Convenções
 
@@ -29,7 +30,8 @@ Documentação viva do projeto: grafo de conhecimento alimentado por Markdown, r
 | Documentação conceitual                      | Em andamento  |
 | Fase 0 — fundação (monorepo, Docker, corpus) | Concluída     |
 | Core (ingestão, índices, grafo)              | Fase 1+       |
-| Servidor MCP                                 | Stub (Fase 5) |
+| Servidor MCP                                 | Fase 5        |
+| Graph Explorer (UI humana)                   | Entregue      |
 
 ## Leitura recomendada
 

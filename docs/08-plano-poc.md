@@ -114,9 +114,18 @@ Criar `benchmark/queries.jsonl`:
 
 ---
 
+## Graph Explorer (UI humana) — entrega separada
+
+A POC original listava UI administrativa do grafo como **fora do escopo**. O **Graph Explorer** (`packages/web` + `packages/api`) foi implementado como evolução separada: exploração visual read-only para humanos, sem ingest nem edição pelo browser.
+
+- Guia de UX e operação: [10-explorador-grafo.md](./10-explorador-grafo.md)
+- Scripts: `pnpm explorer:up`, `explorer:api`, `explorer:web`, `test:explorer`
+
+---
+
 ## Fora do roadmap imediato
 
-- UI administrativa do grafo
+- Edição / ingest pelo browser (o explorer é somente leitura)
 - Fine-tuning de embeddings
 - Templates além de landing (email, deck)
 - Detecção automática de `contradicts`
