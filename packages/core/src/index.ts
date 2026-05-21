@@ -8,6 +8,8 @@ export {
 
 export {
   docIdFromPath,
+  artifactIdFromPath,
+  folderIdFromPath,
   sectionIdFromParts,
   chunkIdFromParts,
   edgeIdFromParts,
@@ -41,12 +43,25 @@ export type {
 export {
   GTM_NODE_TYPES,
   GTM_EDGE_TYPES,
+  ARTIFACT_NODE_TYPES,
+  ARTIFACT_EDGE_TYPES,
   STRUCTURAL_NODE_TYPES,
   STRUCTURAL_EDGE_TYPES,
   DEFAULT_EXPANSION_EDGE_TYPES,
+  FILE_LIKE_NODE_TYPES,
+  isFileLikeNodeType,
   isGtmNodeType,
   isGtmEdgeType,
 } from "./graph/ontology.js";
+
+export {
+  normalizeCorpusPath,
+  parentDirPath,
+  folderPrefixesForFile,
+} from "./corpus/path-utils.js";
+export { attachLineRangesToChunks } from "./corpus/line-anchors.js";
+
+export type { CorpusReadPort } from "./ports/corpus-read.js";
 
 export {
   createEntityExtractor,
@@ -83,6 +98,24 @@ export {
 export { chunkDocument, type ChunkerOptions, type ChunkerResult } from "./chunk/chunker.js";
 
 export { ingestWorkspace } from "./ingest/ingest-workspace.js";
+export {
+  ingestArtifacts,
+  type ArtifactIngestStats,
+  type IngestArtifactsOptions,
+} from "./artifacts/ingest-artifacts.js";
+export {
+  detectArtifactType,
+  extractModule,
+  normalizeVolumeArtifactPath,
+  type ArtifactType,
+} from "./artifacts/artifact-type.js";
+export {
+  flattenJsonForIndex,
+  flattenedFieldsToIndexText,
+  type FlattenedField,
+} from "./artifacts/json-flatten.js";
+export { chunkVolMarkdownBySections } from "./artifacts/vol-sections.js";
+export { parseDeliveryManifest } from "./artifacts/delivery-manifest.js";
 
 export type { EmbeddingProvider } from "./ports/embedding-provider.js";
 export { DEFAULT_EMBEDDING_DIMENSIONS } from "./ports/embedding-provider.js";
@@ -160,10 +193,16 @@ export {
   nodeDetailDtoSchema,
   graphQuerySchema,
   searchQuerySchema,
+  corpusTreeNodeSchema,
+  fileContentDtoSchema,
+  chunkAnchorSchema,
   type GraphNodeDTO,
   type GraphLinkDTO,
   type GraphSnapshotDTO,
   type NodeDetailDTO,
+  type CorpusTreeNode,
+  type FileContentDTO,
+  type ChunkAnchorDTO,
 } from "./explorer/schemas.js";
 
 export {

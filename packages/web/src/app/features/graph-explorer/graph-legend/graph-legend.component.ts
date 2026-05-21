@@ -33,22 +33,26 @@ import { edgeColor, nodeColor } from "@kg/core/explorer/graph-theme";
     `
       .legend {
         position: absolute;
-        left: 0.75rem;
-        bottom: 0.75rem;
+        right: 0.5rem;
+        bottom: 0.5rem;
         z-index: 2;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.75rem;
-        max-width: 200px;
+        background: rgba(37, 37, 38, 0.92);
+        border: 1px solid #3c3c3c;
+        border-radius: 0;
+        padding: 0.45rem 0.55rem;
+        font-size: 0.7rem;
+        max-width: 180px;
+        max-height: 42vh;
+        overflow: auto;
         pointer-events: none;
+        color: #cccccc;
       }
       h3 {
         margin: 0.25rem 0;
         font-size: 0.7rem;
         text-transform: uppercase;
-        color: #64748b;
+        color: #9d9d9d;
+        letter-spacing: 0.05em;
       }
       ul {
         list-style: none;
@@ -73,14 +77,15 @@ import { edgeColor, nodeColor } from "@kg/core/explorer/graph-theme";
         width: 14px;
       }
       .hint {
-        color: #94a3b8;
+        color: #9d9d9d;
       }
     `,
   ],
 })
 export class GraphLegendComponent {
   readonly nodeLegend = [
-    "Document",
+    "Folder",
+    "File",
     "Section",
     "Chunk",
     "Product",

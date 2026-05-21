@@ -31,3 +31,20 @@ export function effectiveNodeTypes(filters: GraphFilterState): string[] | undefi
   }
   return types;
 }
+
+/** Ensures structural types needed for corpus ↔ graph sync are included in API queries. */
+export function nodeTypesForGraphRequest(
+  filters: GraphFilterState,
+  highlightMode?: "fileNeighborhood" | "chunkNeighborhood",
+): string[] | undefined {
+  const base = effectiveNodeTypes(filters) ?? [...EXPLORER_NODE_TYPES];
+  if (!highlightMode) return base.length >= EXPLORER_NODE_TYPES.length ? undefined : base;
+
+  const required =
+    highlightMode === "chunkNeighborhood"
+      ? ["Chunk", "Section", "File", "Folder"]
+      : ["File", "Folder", "Section", "Chunk"];
+
+  const merged = [...new Set([...base, ...required])];
+  return merged.length >= EXPLORER_NODE_TYPES.length ? undefined : merged;
+}

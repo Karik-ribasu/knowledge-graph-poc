@@ -5,7 +5,8 @@ import type { GraphExpansionStore } from "../graph/graph-expansion.js";
 import { DEFAULT_EXPANSION_EDGE_TYPES, isGtmNodeType } from "../graph/ontology.js";
 import { hybridSearch, DEFAULT_RRF_TOP_K } from "../retrieval/hybrid-search.js";
 import type { HybridSearchHit } from "../retrieval/types.js";
-import { planFacets, type FacetSearchPlan } from "./facet-planner.js";
+import { ARTIFACTS_PATH_PREFIX, planFacets, type FacetSearchPlan } from "./facet-planner.js";
+import type { SearchFilters } from "../retrieval/types.js";
 import {
   emptyPackSections,
   type Brief,
@@ -27,6 +28,11 @@ export interface PackBuilderOptions {
   tokenBudget?: number;
   expansionHops?: number;
   hitsPerQuery?: number;
+  /**
+   * When true (default), retrieval is limited to `artifacts/artifacts/` delivery files.
+   * Set false to use legacy corpus paths (`corpus/business`, etc.).
+   */
+  artifactsOnly?: boolean;
 }
 
 interface ScoredChunk {
@@ -106,11 +112,35 @@ function pathMatchesDocTypes(path: string, docTypes: readonly string[]): boolean
   return docTypes.some((docType) => path.includes(`corpus/${docType}/`));
 }
 
+function pathMatchesPrefix(path: string, prefix: string | undefined): boolean {
+  if (!prefix) return true;
+  return path.startsWith(prefix);
+}
+
+function packSearchFilters(plan: FacetSearchPlan, artifactsOnly: boolean): SearchFilters | undefined {
+  if (!artifactsOnly) {
+    return plan.docTypes.length > 0 ? { docType: plan.docTypes[0] } : undefined;
+  }
+  return {
+    pathPrefix: ARTIFACTS_PATH_PREFIX,
+    ...(plan.modules && plan.modules.length > 0 ? { module: [...plan.modules] } : {}),
+  };
+}
+
+function hitAllowedForPlan(hit: HybridSearchHit, plan: FacetSearchPlan, artifactsOnly: boolean): boolean {
+  if (artifactsOnly) {
+    return pathMatchesPrefix(hit.path, ARTIFACTS_PATH_PREFIX);
+  }
+  return pathMatchesDocTypes(hit.path, plan.docTypes);
+}
+
 async function searchForPlan(
   plan: FacetSearchPlan,
   options: PackBuilderOptions,
+  artifactsOnly: boolean,
 ): Promise<ScoredChunk[]> {
   const hitsPerQuery = options.hitsPerQuery ?? Math.max(5, Math.ceil(DEFAULT_RRF_TOP_K / plan.queries.length));
+  const filters = packSearchFilters(plan, artifactsOnly);
   let merged: ScoredChunk[] = [];
 
   for (const query of plan.queries) {
@@ -118,13 +148,11 @@ async function searchForPlan(
       query,
       embeddingProvider: options.embeddingProvider,
       searchStore: options.searchStore,
+      filters,
       rrfTopK: hitsPerQuery,
       maxPerDoc: 1,
     });
-    const filtered =
-      plan.docTypes.length > 0
-        ? hits.filter((hit) => pathMatchesDocTypes(hit.path, plan.docTypes))
-        : hits;
+    const filtered = hits.filter((hit) => hitAllowedForPlan(hit, plan, artifactsOnly));
 
     merged = mergeChunks(
       merged,
@@ -176,9 +204,12 @@ function assignExpansionHits(
   hits: readonly HybridSearchHit[],
   facetPlans: readonly FacetSearchPlan[],
   sectionChunks: Map<PackSectionId, ScoredChunk[]>,
+  artifactsOnly: boolean,
 ): void {
   for (const hit of hits) {
-    const matchingPlans = facetPlans.filter((plan) => pathMatchesDocTypes(hit.path, plan.docTypes));
+    if (artifactsOnly && !pathMatchesPrefix(hit.path, ARTIFACTS_PATH_PREFIX)) continue;
+
+    const matchingPlans = facetPlans.filter((plan) => hitAllowedForPlan(hit, plan, artifactsOnly));
     const targets = matchingPlans.length > 0 ? matchingPlans : facetPlans;
 
     for (const plan of targets) {
@@ -197,7 +228,8 @@ function assignExpansionHits(
 export async function buildContextPack(options: PackBuilderOptions): Promise<ContextPack> {
   const started = Date.now();
   const tokenBudget = options.tokenBudget ?? DEFAULT_PACK_TOKEN_BUDGET;
-  const facetPlans = planFacets(options.brief);
+  const artifactsOnly = options.artifactsOnly !== false;
+  const facetPlans = planFacets(options.brief, { artifactsOnly });
   const usedChunkIds = new Set<string>();
   const sections = emptyPackSections();
   const facetsCovered: string[] = [];
@@ -206,7 +238,7 @@ export async function buildContextPack(options: PackBuilderOptions): Promise<Con
   const sectionChunksByPlan: Array<{ plan: FacetSearchPlan; chunks: ScoredChunk[] }> = [];
 
   for (const plan of facetPlans) {
-    const chunks = await searchForPlan(plan, options);
+    const chunks = await searchForPlan(plan, options, artifactsOnly);
     sectionChunks.set(plan.sectionId, chunks);
     sectionChunksByPlan.push({ plan, chunks });
   }
@@ -217,10 +249,11 @@ export async function buildContextPack(options: PackBuilderOptions): Promise<Con
       query,
       embeddingProvider: options.embeddingProvider,
       searchStore: options.searchStore,
+      filters: artifactsOnly ? { pathPrefix: ARTIFACTS_PATH_PREFIX } : undefined,
       rrfTopK: options.hitsPerQuery ?? 8,
       maxPerDoc: 1,
     });
-    assignExpansionHits(hits, facetPlans, sectionChunks);
+    assignExpansionHits(hits, facetPlans, sectionChunks, artifactsOnly);
   }
 
   for (const plan of facetPlans) {
@@ -256,6 +289,7 @@ export async function buildContextPack(options: PackBuilderOptions): Promise<Con
       token_estimate: tokenEstimate,
       facets_covered: facetsCovered,
       duration_ms: Date.now() - started,
+      source: artifactsOnly ? "artifacts" : "corpus",
     },
   };
 }

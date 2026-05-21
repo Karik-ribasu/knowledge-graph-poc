@@ -1,0 +1,26 @@
+{
+  "venture_id": "v-b4u-bet-001",
+  "critique_id": "crit-b4u-001",
+  "overall_score": 78,
+  "recommendation": "approve_with_notes",
+  "dimension_scores": {
+    "market_clarity": 82,
+    "customer_definition": 76,
+    "value_proposition": 80,
+    "business_model_viability": 74,
+    "gtm_feasibility": 77,
+    "narrative_coherence": 81,
+    "risk_awareness": 79,
+    "execution_realism": 75
+  },
+  "strengths": [
+    "Posicionamento anti-casa-de-apostas claro e investível",
+    "Múltiplas linhas de receita com governança de afiliados",
+    "Tese BR-first com expansão global bem articulada"
+  ],
+  "improvements": [
+    "Detalhar contratos data rights e fallback providers no Vol 7",
+    "Stress-test CAC em cenário bear com creators saturados"
+  ],
+  "iteration_required": false
+}

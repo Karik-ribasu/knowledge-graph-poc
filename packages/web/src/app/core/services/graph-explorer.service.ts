@@ -5,7 +5,7 @@ import type { GraphSearchHit } from "@kg/core/ports/graph-read";
 import { firstValueFrom } from "rxjs";
 import { environment } from "../../../environments/environment";
 import type { GraphFilterState } from "../models/graph-filters.model";
-import { effectiveNodeTypes } from "../models/graph-filters.model";
+import { nodeTypesForGraphRequest } from "../models/graph-filters.model";
 
 export interface GraphStats {
   ok: boolean;
@@ -43,12 +43,17 @@ export class GraphExplorerService {
     }
   }
 
-  async loadGraph(filters: GraphFilterState, seed?: string, hops?: number): Promise<void> {
+  async loadGraph(
+    filters: GraphFilterState,
+    seed?: string,
+    hops?: number,
+    highlightMode?: "fileNeighborhood" | "chunkNeighborhood",
+  ): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
     try {
       let params = new HttpParams();
-      const nodeTypes = effectiveNodeTypes(filters);
+      const nodeTypes = nodeTypesForGraphRequest(filters, highlightMode);
       if (nodeTypes !== undefined) {
         for (const t of nodeTypes) {
           params = params.append("nodeTypes", t);
@@ -59,6 +64,9 @@ export class GraphExplorerService {
       }
       if (seed) {
         params = params.set("seed", seed).set("hops", String(hops ?? 1));
+      }
+      if (highlightMode) {
+        params = params.set("highlightMode", highlightMode);
       }
       const snapshot = await firstValueFrom(
         this.http.get<GraphSnapshotDTO>(`${this.base}/graph`, { params }),

@@ -1,0 +1,23 @@
+{
+  "workflow_id": "brandCreationWorkflow",
+  "pipeline_id": "brand-creation",
+  "venture_id": "v-b4u-bet-001",
+  "brand_name": "B4U.bet",
+  "completed_at": "2026-05-20T19:30:00Z",
+  "critique_score": 81,
+  "status": "approved",
+  "agents_executed": [
+    "brand-strategy",
+    "market-research",
+    "moodboard-curation",
+    "creative-direction",
+    "naming",
+    "visual-system-design",
+    "logo-study",
+    "logo-design",
+    "brand-critique",
+    "brand-imagery",
+    "brand-book-composition"
+  ],
+  "image_artifacts_pending_generation": 7
+}

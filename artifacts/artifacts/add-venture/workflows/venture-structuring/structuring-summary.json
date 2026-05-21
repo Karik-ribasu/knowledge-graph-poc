@@ -1,0 +1,26 @@
+{
+  "workflow_id": "ventureStructuringWorkflow",
+  "pipeline_id": "venture-structuring",
+  "venture_id": "v-b4u-bet-001",
+  "opportunity_id": "opp-b4u-bet-2026-001",
+  "venture_name": "B4U.bet",
+  "completed_at": "2026-05-20T17:45:00Z",
+  "status": "approved",
+  "critique_overall_score": 78,
+  "volumes_produced": 8,
+  "agents_executed": [
+    "briefing-interpreter",
+    "opportunity-analyst-vol1",
+    "customer-market-architect",
+    "value-proposition-designer",
+    "business-model-modeler",
+    "gtm-planner",
+    "narrative-strategist",
+    "risk-validation-analyst",
+    "execution-roadmap-planner",
+    "venture-critic",
+    "dossier-composer"
+  ],
+  "next_module": "brand-aid",
+  "next_workflow": "brandCreationWorkflow"
+}

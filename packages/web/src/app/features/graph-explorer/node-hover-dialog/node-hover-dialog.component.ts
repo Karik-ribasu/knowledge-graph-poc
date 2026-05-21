@@ -12,17 +12,11 @@ import type { ForceGraphNode } from "../../../core/utils/force-graph-data";
         [style.left.px]="x()"
         [style.top.px]="y()"
       >
-        <strong>{{ n.label }}</strong>
+        <strong class="label">{{ n.label }}</strong>
         <div class="row"><span class="k">tipo</span> {{ n.type }}</div>
-        <div class="row"><span class="k">id</span> <code>{{ n.id }}</code></div>
+        <div class="row id-row"><span class="k">id</span> <code>{{ n.id }}</code></div>
         @if (n.path) {
-          <div class="row"><span class="k">path</span> {{ n.path }}</div>
-        }
-        @if (n.doc_type) {
-          <div class="row"><span class="k">doc_type</span> {{ n.doc_type }}</div>
-        }
-        @if (n.name) {
-          <div class="row"><span class="k">name</span> {{ n.name }}</div>
+          <div class="row"><span class="k">path</span> <span class="v">{{ n.path }}</span></div>
         }
       </div>
     }
@@ -32,26 +26,39 @@ import type { ForceGraphNode } from "../../../core/utils/force-graph-data";
       .hover-card {
         position: fixed;
         z-index: 1000;
-        transform: translate(12px, 12px);
+        transform: translate(14px, -50%);
         pointer-events: none;
-        background: #0f172a;
-        color: #f8fafc;
-        border-radius: 8px;
-        padding: 0.5rem 0.75rem;
+        background: #252526;
+        color: #cccccc;
+        border: 1px solid #3c3c3c;
+        border-radius: 0;
+        padding: 0.5rem 0.65rem;
         font-size: 0.8rem;
-        max-width: 320px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        max-width: 340px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+        line-height: 1.45;
+      }
+      .label {
+        display: block;
+        color: #ffffff;
+        font-size: 0.88rem;
+        margin-bottom: 0.35rem;
       }
       .row {
-        margin-top: 0.2rem;
+        margin-top: 0.15rem;
       }
       .k {
-        color: #94a3b8;
+        color: #9d9d9d;
         margin-right: 0.35rem;
       }
+      .v,
       code {
-        font-size: 0.72rem;
+        font-size: 0.75rem;
         word-break: break-all;
+      }
+      code {
+        font-family: Consolas, monospace;
+        color: #d4d4d4;
       }
     `,
   ],

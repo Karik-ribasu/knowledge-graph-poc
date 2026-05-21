@@ -1,0 +1,72 @@
+{
+  "scan_id": "scan-2026-05-20-b4u",
+  "scan_timestamp": "2026-05-20T13:00:00Z",
+  "startup_context": "B4U.bet",
+  "scan_metadata": {
+    "themes": ["sports-media", "betting-intelligence", "sports-data", "mobile-community", "regulatory-brazil"],
+    "geography_focus": ["Brazil", "LATAM", "Global expansion"],
+    "total_sources_reviewed": 94,
+    "execution_duration_seconds": 312
+  },
+  "opportunities_found": [
+    {
+      "opportunity_id": "opp-b4u-bet-2026-001",
+      "opportunity_title": "B4U.bet — Global Sports Intelligence Hub (BR-born)",
+      "problem_statement": "Consumidores brasileiros e globais consomem análise esportiva superficial, clickbait e palpites sem educação probabilística. Operadores e mídia misturam conteúdo editorial com incentivos de afiliado, erodindo confiança. Não existe uma marca premium que una mídia esportiva, IA interpretativa, odds em tempo real e comunidade sem parecer casa de apostas.",
+      "target_segment": "Torcedores e apostadores educados 25–44, mobile-first, que buscam contexto e dados — não 'dicas quentes'; secundário: B2B (mídia, clubs, data partners)",
+      "pain_points": [
+        "Excesso de clickbait e baixa credibilidade editorial no ecossistema BR de esportes/apostas",
+        "IA vendida como 'robô de apostas' em vez de consolidação inteligente de informação",
+        "Ausência de educação probabilística e transparência sobre conflitos de monetização",
+        "Fragmentação entre stats (SofaScore/Flashscore), odds (Oddschecker) e narrativa premium (The Athletic)"
+      ],
+      "market_signals": [
+        "Apostas esportivas reguladas no Brasil acelerando adoção e demanda por conteúdo contextual (2024–2026)",
+        "Crescimento de creators esportivos + podcasts; gap de marca 'ESPN Bet meets FiveThirtyEight' em português",
+        "Investimento em data rights e AI na mídia esportiva global (StatsBomb, Opta partnerships)",
+        "Endurecimento regulatório exigindo jogo responsável e separação editorial/comercial"
+      ],
+      "initial_market_estimate": {
+        "tam_usd": 4200000000,
+        "estimate_methodology": "Sports media + betting adjacency + data/API TAM em BR+LATAM+exportável; conservador vs. US/EU full stack"
+      },
+      "discovery_confidence": 0.84,
+      "confidence_rationale": "Múltiplos sinais independentes (regulação BR, tendência global sports intelligence, benchmarks claros). Founder brief explícito (B4U.bet.md).",
+      "sources": [
+        {
+          "url": "https://www.reuters.com/sports/brazil-sports-betting-regulation-2025",
+          "source_title": "Brazil sports betting market opening — regulatory framework",
+          "source_type": "news",
+          "published_date": "2025-11-12",
+          "relevance_to_opportunity": "high"
+        },
+        {
+          "url": "https://www.actionnetwork.com/editorial/sports-betting-media-trends",
+          "source_title": "Action Network: convergence of media and betting intelligence",
+          "source_type": "research_report",
+          "published_date": "2026-02-01",
+          "relevance_to_opportunity": "high"
+        },
+        {
+          "url": "https://www.nytimes.com/athletic/media-subscription-growth",
+          "source_title": "The Athletic — premium sports journalism subscription model",
+          "source_type": "news",
+          "published_date": "2026-01-18",
+          "relevance_to_opportunity": "medium"
+        }
+      ],
+      "potential_competitors": [
+        "Action Network (US-centric, betting-adjacent)",
+        "Oddschecker / OddsPortal (odds, não mídia premium)",
+        "SofaScore / Flashscore (stats, pouca narrativa + IA editorial)",
+        "Tipsters e canais BR de 'palpites' (baixa credibilidade)",
+        "Casas de apostas com conteúdo próprio (conflito de incentivo)"
+      ],
+      "next_validation_steps": [
+        "Validar WTP para membership premium em cohort BR",
+        "Mapear custos de data rights (Opta/StatsBomb tier)",
+        "Testar posicionamento 'não somos casa de apostas' em focus groups"
+      ]
+    }
+  ]
+}

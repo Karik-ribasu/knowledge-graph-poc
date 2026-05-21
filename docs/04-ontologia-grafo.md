@@ -8,9 +8,10 @@ Modelo mínimo para suportar discovery de conteúdo para síntese (landing page 
 
 | Tipo             | Descrição                | Propriedades exemplo              |
 | ---------------- | ------------------------ | --------------------------------- |
-| `Document`       | Arquivo `.md`            | `path`, `doc_type`, `updated_at`  |
-| `Section`        | Bloco sob heading        | `heading`, `level`                |
-| `Chunk`          | Unidade de indexação     | `text`, `token_count`, `chunk_id` |
+| `Folder`         | Diretório no corpus      | `path`, `name`                    |
+| `File`           | Arquivo `.md` ingerido   | `path`, `doc_type`, `title`, `content_hash` |
+| `Section`        | Bloco sob heading        | `heading`, `level`, `ordinal`     |
+| `Chunk`          | Unidade de indexação     | `text`, `token_count`, `chunk_id`, `start_line`, `end_line`, `path` |
 | `Product`        | Oferta / produto         | `name`                            |
 | `Persona`        | Público-alvo             | `name`, `segment`                 |
 | `PainPoint`      | Dor do cliente           | `label`                           |
@@ -20,13 +21,15 @@ Modelo mínimo para suportar discovery de conteúdo para síntese (landing page 
 | `Claim`          | Afirmação / prova        | `text`, `metric`                  |
 | `StackComponent` | Tech da stack padrão     | `name`, `category`                |
 
+> **Migração:** nós antigos com `node_type = 'Document'` foram renomeados para `File`. Leituras da API aceitam ambos onde aplicável.
+
 ---
 
 ## 2. Tipos de aresta
 
 | Aresta            | De → Para                  | Origem típica                   |
 | ----------------- | -------------------------- | ------------------------------- |
-| `contains`        | Document → Section → Chunk | Parse estrutural                |
+| `contains`        | Folder → Folder/File; File → Section → Chunk | Parse estrutural + árvore de pastas |
 | `mentions`        | Chunk → Entity             | NER / regex / LLM com schema    |
 | `citedIn`         | Entity → Chunk             | Inverso de `mentions`           |
 | `targets`         | Product → Persona          | Docs de negócio                 |
@@ -37,7 +40,7 @@ Modelo mínimo para suportar discovery de conteúdo para síntese (landing page 
 | `competesWith`    | Product → Competitor       | Mercado                         |
 | `supports`        | Claim → Benefit            | Métricas, cases                 |
 | `contradicts`     | Claim → Claim              | Fase 2 — detecção manual ou LLM |
-| `linksTo`         | Document → Document        | Wikilinks `[[...]]`             |
+| `linksTo`         | File → File                | Wikilinks `[[...]]`             |
 
 ---
 
@@ -45,7 +48,7 @@ Modelo mínimo para suportar discovery de conteúdo para síntese (landing page 
 
 | Fase   | O que construir                                       | Valor                               |
 | ------ | ----------------------------------------------------- | ----------------------------------- |
-| **P0** | `Document`, `Section`, `Chunk`, `contains`, `linksTo` | Proveniência + navegação entre docs |
+| **P0** | `Folder`, `File`, `Section`, `Chunk`, `contains`, `linksTo` | Proveniência + navegação entre docs |
 | **P1** | Entidades via frontmatter + headings + wikilinks      | Grafo útil sem LLM pesado           |
 | **P2** | Extração assistida (LLM + JSON schema fixo) para GTM  | Relações `hasPain`, `enables`, etc. |
 | **P3** | `contradicts`, pesos, versionamento                   | Consistência em corpus vivo         |
@@ -57,8 +60,10 @@ Modelo mínimo para suportar discovery de conteúdo para síntese (landing page 
 Todo nó derivado de texto deve permitir voltar à fonte:
 
 ```
-Chunk.chunk_id → Section.heading → Document.path
+Chunk.chunk_id → Section.heading → File.path
 ```
+
+Âncoras de linha no ingest (`start_line`, `end_line`) permitem sincronizar o Graph Explorer com o painel de conteúdo do arquivo.
 
 Citações no `ContextPack` usam esse encadeamento.
 
@@ -80,26 +85,6 @@ O retrieval e a expansão no grafo podem **restringir** tipos (ex.: landing B2C 
 
 ---
 
-## 6. Diagrama simplificado
+## 6. Estrutura filesystem no grafo
 
-```mermaid
-flowchart LR
-  Doc[Document] --> Sec[Section]
-  Sec --> Ch[Chunk]
-  Ch -->|mentions| Per[Persona]
-  Ch -->|mentions| Feat[Feature]
-  Prod[Product] -->|targets| Per
-  Per -->|hasPain| Pain[PainPoint]
-  Pain -->|addressedBy| Feat
-  Feat -->|enables| Ben[Benefit]
-  Feat -->|implementedWith| Stack[StackComponent]
-  Prod -->|competesWith| Comp[Competitor]
-  Claim[Claim] -->|supports| Ben
-```
-
----
-
-## 7. Leitura relacionada
-
-- [05-retrieval-hibrido.md](./05-retrieval-hibrido.md) — como o grafo entra após RRF.
-- [06-fluxo-landing-page.md](./06-fluxo-landing-page.md) — quais tipos cada facet prioriza.
+Durante o ingest, cada segmento de path sob `corpus/` vira um nó `Folder` com arestas `contains` pai→filho. Cada `.md` vira um nó `File` ligado à pasta pai. O conteúdo segue `File → Section → Chunk` como antes.

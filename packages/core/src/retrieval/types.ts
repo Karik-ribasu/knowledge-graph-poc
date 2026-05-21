@@ -1,5 +1,9 @@
 export interface SearchFilters {
   docType?: string;
+  /** Artifact pipeline modules (opportunity, add-venture, brand-aid). */
+  module?: readonly string[];
+  /** Only chunks whose document path starts with this prefix (e.g. artifacts/artifacts/). */
+  pathPrefix?: string;
 }
 
 export interface RankedSearchHit {

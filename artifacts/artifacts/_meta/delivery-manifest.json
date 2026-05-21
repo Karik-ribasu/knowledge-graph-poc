@@ -1,0 +1,26 @@
+{
+  "delivery_id": "del-b4u-bet-2026-05-20",
+  "startup_name": "B4U.bet",
+  "delivered_at": "2026-05-20T18:00:00Z",
+  "source_brief": "B4U.bet.md",
+  "modules": ["opportunity", "add-venture", "brand-aid"],
+  "venture": {
+    "venture_id": "v-b4u-bet-001",
+    "opportunity_id": "opp-b4u-bet-2026-001",
+    "legal_name": "B4U Intelligence Ltda.",
+    "brand_name": "B4U.bet"
+  },
+  "handoff_chain": [
+    { "from": "opportunity", "to": "add-venture", "gate": "score >= 75", "status": "ADVANCE" },
+    { "from": "add-venture", "to": "brand-aid", "gate": "dossier approved", "status": "approved" }
+  ],
+  "image_prompt_files": [
+    "brand-aid/agents/logo-study/logo-concept-radar.image-prompt.md",
+    "brand-aid/agents/logo-study/logo-concept-signal.image-prompt.md",
+    "brand-aid/agents/logo-design/logo-primary-lockup.image-prompt.md",
+    "brand-aid/agents/logo-design/logo-icon-only.image-prompt.md",
+    "brand-aid/agents/brand-imagery/hero-mobile-app.image-prompt.md",
+    "brand-aid/agents/brand-imagery/editorial-hero.image-prompt.md",
+    "brand-aid/agents/moodboard-curation/moodboard-premium-sports.image-prompt.md"
+  ]
+}

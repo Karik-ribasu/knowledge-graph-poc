@@ -16,6 +16,8 @@ Documentação viva do projeto: grafo de conhecimento alimentado por Markdown, r
 | [08-plano-poc.md](./08-plano-poc.md)                           | Fases, entregáveis, métricas, riscos                            |
 | [09-decisoes-stack.md](./09-decisoes-stack.md)                 | TypeScript, Postgres+pgvector, BGE-M3, alternativas descartadas |
 | [10-explorador-grafo.md](./10-explorador-grafo.md)             | Graph Explorer — UX, API REST, testes e QA manual               |
+| [11-proposta-indexacao-artifacts.md](./11-proposta-indexacao-artifacts.md) | Indexação v2 centrada em `artifacts/artifacts/` (substitui corpus-only) |
+| [12-roteiro-landing-via-grafo.md](./12-roteiro-landing-via-grafo.md) | Playbook MCP: brief B4U → buscas → prompt de geração frontend |
 
 ## Convenções
 

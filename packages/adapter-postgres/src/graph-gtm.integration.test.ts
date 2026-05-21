@@ -56,7 +56,7 @@ describe("GTM graph (integration)", () => {
       expect(expanded.nodes.length).toBeGreaterThan(1);
       expect(
         expanded.nodes.some(
-          (n) => n.nodeType === "Competitor" || n.nodeType === "Product" || n.nodeType === "Document",
+          (n) => n.nodeType === "Competitor" || n.nodeType === "Product" || n.nodeType === "File",
         ),
       ).toBe(true);
 

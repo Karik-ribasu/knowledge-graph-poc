@@ -78,7 +78,12 @@ export const graphQuerySchema = z.object({
     }),
   docType: z.string().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(500).optional(),
+  /** Preset expansion: fileNeighborhood | chunkNeighborhood */
+  highlightMode: z.enum(["fileNeighborhood", "chunkNeighborhood"]).optional(),
 });
+
+export { corpusTreeNodeSchema, fileContentDtoSchema, chunkAnchorSchema } from "./corpus-schemas.js";
+export type { CorpusTreeNode, FileContentDTO, ChunkAnchorDTO } from "./corpus-schemas.js";
 
 export const searchQuerySchema = z.object({
   q: z.string().min(1),

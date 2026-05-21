@@ -1,9 +1,4 @@
-import {
-  createPool,
-  getGraphCounts,
-  PostgresChunkIndexStore,
-  runMigrations,
-} from "@kg/adapter-postgres";
+import { createPool, getGraphCounts, PostgresChunkIndexStore } from "@kg/adapter-postgres";
 import type { FastifyInstance } from "fastify";
 import type { ApiEnv } from "../lib/env.js";
 import { apiError } from "../lib/errors.js";
@@ -13,7 +8,6 @@ export async function registerStatsRoutes(
   env: ApiEnv,
 ): Promise<void> {
   app.get("/stats", async (_request, reply) => {
-    await runMigrations("up", env.databaseUrl);
     const pool = createPool(env.databaseUrl);
     try {
       const counts = await getGraphCounts(pool);

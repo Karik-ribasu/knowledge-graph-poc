@@ -1,0 +1,43 @@
+{
+  "venture_id": "v-b4u-bet-001",
+  "opportunity_id": "opp-b4u-bet-2026-001",
+  "venture_name": "B4U.bet",
+  "legal_entity_suggested": "B4U Intelligence Ltda.",
+  "created_date": "2026-05-20T17:45:00Z",
+  "created_by": "add-venture-module",
+  "status": "approved",
+  "critique_result": { "overall_score": 78 },
+  "executive_summary": {
+    "narrative_summary": "B4U.bet é uma venture global nascida no Brasil que unifica mídia esportiva premium, IA interpretativa, estatísticas, odds e comunidade num hub de sports intelligence. A empresa evita deliberadamente o posicionamento de casa de apostas ou tipster, apostando em credibilidade editorial, educação probabilística e transparência comercial. Com TAM $4.2B e modelo multi-receita (subscription, ads qualificados, API, afiliados governados), busca capturar o vácuo entre utilitários de stats e mídia premium ocidental, com beachhead no futebol BR mobile-first.",
+    "opportunity_snapshot": "Score oportunidade 82/100. Regulação BR e demanda por conteúdo responsável criam janela. Moat: humanos+IA, governança ética, stack de dados.",
+    "customer_snapshot": "Primário: torcedores/apostadores 25-44 BR mobile-first. WTP hipótese R$39-59/mo.",
+    "business_model_snapshot": "Year 1: $1.8M revenue, 22k subs, funding ask $3.2M 12m."
+  },
+  "key_metrics": {
+    "market_tam_usd": 4200000000,
+    "market_sam_usd": 890000000,
+    "market_som_usd": 42000000,
+    "year_1_revenue_target": 1800000,
+    "year_1_customer_target": 22000,
+    "cac": 28,
+    "ltv": 186,
+    "payback_period_months": 4,
+    "funding_required_12_months": 3200000,
+    "critique_overall_score": 78
+  },
+  "volume_artifacts": {
+    "vol_0": "artifacts/add-venture/agents/briefing-interpreter/vol-0-intake.json",
+    "vol_1": "artifacts/add-venture/agents/opportunity-analyst-vol1/vol-1-opportunity-diagnosis.md",
+    "vol_2": "artifacts/add-venture/agents/customer-market-architect/vol-2-customer-market.md",
+    "vol_3": "artifacts/add-venture/agents/value-proposition-designer/vol-3-value-proposition.md",
+    "vol_4": "artifacts/add-venture/agents/business-model-modeler/vol-4-business-model.json",
+    "vol_5": "artifacts/add-venture/agents/gtm-planner/vol-5-gtm.md",
+    "vol_6": "artifacts/add-venture/agents/narrative-strategist/vol-6-brand-narrative.md",
+    "vol_7": "artifacts/add-venture/agents/risk-validation-analyst/vol-7-risks.md",
+    "vol_8": "artifacts/add-venture/agents/execution-roadmap-planner/vol-8-execution.md"
+  },
+  "artifact_refs": {
+    "json_path": "artifacts/add-venture/agents/dossier-composer/venture-dossier.json",
+    "pdf_path": "artifacts/add-venture/agents/dossier-composer/venture-dossier.pdf.md"
+  }
+}

@@ -4,6 +4,7 @@ export interface ApiEnv {
   graphMaxEdges: number;
   databaseUrl: string;
   corsOrigin: string;
+  workspaceRoot: string;
 }
 
 export function loadApiEnv(env: NodeJS.ProcessEnv = process.env): ApiEnv {
@@ -12,12 +13,15 @@ export function loadApiEnv(env: NodeJS.ProcessEnv = process.env): ApiEnv {
     throw new Error("DATABASE_URL is required");
   }
 
+  const workspaceRoot = env.KG_WORKSPACE ?? process.cwd();
+
   return {
     apiPort: parseIntEnv(env.API_PORT, 3001),
     graphMaxNodes: parseIntEnv(env.GRAPH_MAX_NODES, 300),
     graphMaxEdges: parseIntEnv(env.GRAPH_MAX_EDGES, 600),
     databaseUrl,
     corsOrigin: env.CORS_ORIGIN ?? "http://localhost:4200",
+    workspaceRoot,
   };
 }
 

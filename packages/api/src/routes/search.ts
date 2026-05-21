@@ -1,4 +1,4 @@
-import { createPool, PostgresGraphReadRepository, runMigrations } from "@kg/adapter-postgres";
+import { createPool, PostgresGraphReadRepository } from "@kg/adapter-postgres";
 import { searchQuerySchema } from "@kg/core";
 import type { FastifyInstance } from "fastify";
 import type { ApiEnv } from "../lib/env.js";
@@ -15,7 +15,6 @@ export async function registerSearchRoutes(
       return apiError(parsed.error.message, "INVALID_QUERY");
     }
 
-    await runMigrations("up", env.databaseUrl);
     const pool = createPool(env.databaseUrl);
     try {
       const repo = new PostgresGraphReadRepository(pool, {

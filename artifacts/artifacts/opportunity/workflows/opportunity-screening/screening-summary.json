@@ -1,0 +1,21 @@
+{
+  "workflow_id": "opportunityScreeningWorkflow",
+  "pipeline_id": "opportunity-screening",
+  "startup_name": "B4U.bet",
+  "run_id": "run-opp-screen-b4u-001",
+  "completed_at": "2026-05-20T14:22:00Z",
+  "input_type": "founder_brief",
+  "outcome": {
+    "primary_opportunity_id": "opp-b4u-bet-2026-001",
+    "recommendation": "advance",
+    "handoff_to": "add-venture",
+    "total_score": 82
+  },
+  "steps_completed": [
+    "market-scanner",
+    "opportunity-analyst",
+    "scoring",
+    "prioritization"
+  ],
+  "notes": "Oportunidade alinhada ao brief B4U.bet: plataforma premium de inteligência esportiva (mídia + IA + dados), posicionamento anti-casa-de-apostas, mercado BR mobile-first com expansão global."
+}

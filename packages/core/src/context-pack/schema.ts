@@ -48,6 +48,7 @@ export const contextPackSchema = z.object({
     token_estimate: z.number().int().nonnegative(),
     facets_covered: z.array(z.string()),
     duration_ms: z.number().int().nonnegative().optional(),
+    source: z.enum(["artifacts", "corpus"]).optional(),
   }),
 });
 

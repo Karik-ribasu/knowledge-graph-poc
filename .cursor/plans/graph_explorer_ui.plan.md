@@ -1,417 +1,282 @@
 ---
-name: Graph Explorer UI
-overview: Frontend web humano (estilo GitNexus) em Angular 19.2.0 para visualizar e navegar o grafo da POC — canvas force-directed com nós/arestas estilizados por tipo e grau, hover com identificação rápida, clique com sidebar de detalhe completo — apoiado por API REST read-only no monorepo TypeScript, Docker dev e testes unitários/integração/E2E.
+name: Graph Explorer — Navegação Corpus (GitNexus-like)
+overview: Evolução do Graph Explorer com barra lateral estilo VS Code/Cursor para arquivos e pastas, painel de conteúdo do arquivo, e sincronização bidirecional com o grafo — nós Folder/File para filesystem, Section/Chunk/GTM para conteúdo; clique no trecho do arquivo destaca o nó Chunk exato.
 todos:
-  - id: explorer-phase-0
-    content: "Fase 0: pacotes api/web, docs/10-explorador-grafo.md, Docker profile explorer, env vars"
-    status: pending
-  - id: explorer-phase-1
-    content: "Fase 1: GraphReadPort + NodeDetailPort + PostgresGraphReadRepository + testes integration"
-    status: pending
-  - id: explorer-phase-2
-    content: "Fase 2: API Fastify REST (/graph, /nodes/:id, /stats, /search) + testes supertest"
-    status: pending
-  - id: explorer-phase-3
-    content: "Fase 3: shell UI Angular 19.2 (layout, filtros, GraphExplorerService, Material sidenav)"
-    status: pending
-  - id: explorer-phase-4
-    content: "Fase 4: GraphCanvas ngx-graph/force-graph (tamanho, cores nó/aresta, legenda)"
-    status: pending
-  - id: explorer-phase-5
-    content: "Fase 5: hover dialog + sidebar detalhe Markdown + expandir vizinhos + Playwright"
-    status: pending
-  - id: explorer-phase-6
-    content: "Fase 6: README, CI explorer, cobertura, atualizar docs/08, checklist QA manual"
-    status: pending
+  - id: nav-phase-0
+    content: "Fase 0: decisão ontologia Folder/File + contratos API corpus tree / file content / chunk anchors"
+    status: completed
+  - id: nav-phase-1
+    content: "Fase 1: ingest — nós Folder/File, contains hierárquico, proveniência com startLine/endLine em chunks"
+    status: completed
+  - id: nav-phase-2
+    content: "Fase 2: API — GET /corpus/tree, /files/:path, /documents/:id/chunks, graph highlight por seed"
+    status: completed
+  - id: nav-phase-3
+    content: "Fase 3: UI — CorpusTreeSidenav (esquerda), layout 3 colunas, tema dark Cursor"
+    status: completed
+  - id: nav-phase-4
+    content: "Fase 4: FileContentPanel — markdown renderizado, mapa chunk↔linhas, clique → foco Chunk no grafo"
+    status: completed
+  - id: nav-phase-5
+    content: "Fase 5: sincronização grafo↔árvore — seleção arquivo, ego-network, hover dim (já parcial)"
+    status: completed
+  - id: nav-phase-6
+    content: "Fase 6: testes Playwright + browser manual + docs/10 + migração Document→File"
+    status: completed
 isProject: false
 ---
 
-# Plano de execução — Graph Explorer (UI humana)
+# Plano — Graph Explorer: navegação por corpus (estilo GitNexus / Cursor)
 
-## Contexto e escopo
+## Status do trabalho anterior
 
-A POC backend ([poc_knowledge_graph_d173250f.plan.md](./poc_knowledge_graph_d173250f.plan.md)) está concluída: Postgres com `nodes`/`edges`, ingest, MCP para IAs. Este plano adiciona uma **ferramenta web só para humanos** — exploração visual do grafo, **sem** expor MCP nem fluxos de Context Pack.
+As fases **0–6** do plano original (API read-only, canvas force-graph, hover, sidenav detalhe, tema dark, Playwright) estão **implementadas** no repositório. Este documento **substitui o escopo futuro** do explorer e define a próxima entrega.
 
-Referências de domínio:
-
-- Ontologia implementada: [packages/core/src/graph/ontology.ts](packages/core/src/graph/ontology.ts) — tipos `Document`, `Section`, `Chunk`, GTM (`Product`, `ICP`, `Competitor`, …) e arestas `contains`, `linksTo`, `mentions`, `competesWith`, etc.
-- Docs conceituais: [docs/04-ontologia-grafo.md](docs/04-ontologia-grafo.md)
-- Escala atual (corpus NexusFlow): ~31 documentos, ~125 nós, ~233 arestas — adequada para grafo completo com filtros + expansão sob demanda
-
-**Fora deste plano (explícito):** edição do grafo, ingest pela UI, autenticação multi-tenant, 3D/WebGL pesado, substituir Neo4j, integração com agentes/LLM.
-
-**Nota:** [docs/08-plano-poc.md](docs/08-plano-poc.md) listava “UI administrativa do grafo” como fora do escopo da POC original; este plano cobre essa evolução como iniciativa separada.
+**Não alterar:** [poc_knowledge_graph_d173250f.plan.md](./poc_knowledge_graph_d173250f.plan.md)
 
 ---
 
-## Decisão de stack: **Angular 19.2.0 + API Fastify read-only**
+## Objetivo (resumo)
 
-| Critério | Escolha | Alternativa descartada |
-|----------|---------|------------------------|
-| UI framework | **Angular 19.2.0** (pin exato em `package.json`) + **Angular CLI 19.2.x** | React + Vite — fora do escopo por decisão do projeto |
-| Build / dev server | **`@angular/build:application`** (esbuild) via `ng serve` / `ng build` | Vite — não se aplica a Angular |
-| Grafo (force-directed) | **`ForceGraphComponent`** — wrapper Angular sobre **`force-graph`** (mesmo motor d3-force do ecossistema GitNexus/react-force-graph) | `react-force-graph-2d` — depende de React; **ngx-graph** reserva se wrapper vanilla falhar customização de `nodeVal`/cores |
-| Estilo / layout | **Angular Material 19** (`mat-sidenav` = sidebar, `mat-dialog` = hover, `mat-expansion-panel`, `mat-chips`) + SCSS por componente | shadcn/ui — ecossistema React |
-| Estado / HTTP | **Signals** + `HttpClient` + services (`GraphExplorerService`, `NodeDetailService`) | NgRx — overkill para POC |
-| Markdown | **`ngx-markdown`** (ou `marked` + `DomSanitizer`) | `react-markdown` |
-| API | **`packages/api`** — **Fastify 5** + **Zod** (contratos em `@kg/core`) | Reutilizar MCP — MCP é canal para IAs, não HTTP para humanos |
-| Padrão | **Hexagonal** — ports em `core`; adapter Postgres; API e Angular app como driving adapters | SQL e regras de negócio nos components |
+Replicar o fluxo do **GitNexus** / **Explorer do VS Code**:
 
-**Versões obrigatórias (pin):**
-
-```json
-{
-  "@angular/core": "19.2.0",
-  "@angular/cli": "19.2.0",
-  "@angular/common": "19.2.0",
-  "@angular/compiler": "19.2.0",
-  "@angular/platform-browser": "19.2.0",
-  "@angular/material": "^19.2.0"
-}
-```
-
-**Conclusão:** o monorepo pnpm ganha `packages/api` e `packages/web` (app Angular standalone), mais [docs/10-explorador-grafo.md](docs/10-explorador-grafo.md). Reutiliza `DATABASE_URL` e o pool Postgres existente.
+| Ação do usuário | Comportamento esperado |
+|-----------------|------------------------|
+| Navegar pastas/arquivos na **barra esquerda** | Árvore do corpus (`corpus/…`), expandir/colapsar, ícones pasta/arquivo |
+| Clicar em **arquivo** | (1) Abre **painel de conteúdo** com o Markdown exato do arquivo; (2) **Destaca no grafo** o nó do arquivo e vizinhança (contains, linksTo, mentions relevantes) |
+| Clicar em **trecho** do arquivo (heading, parágrafo, bloco) | Destaca o nó **`Chunk`** (ou `Section` se aplicável) — **não** o nó de arquivo |
+| Clicar nó no grafo (File/Chunk/GTM) | Sincroniza seleção na árvore e/ou painel de conteúdo quando for estrutural |
 
 ---
 
-## Modelo visual (requisitos)
+## Modelo de nós (lapidação da ontologia)
+
+### Camadas
 
 ```mermaid
 flowchart TB
-  subgraph layout [Layout_principal]
-    Header[Header_stats_e_busca]
-    Canvas[Canvas_grafo_flex1]
-    Sidebar[Sidebar_detalhe_direita]
+  subgraph fs [Camada filesystem]
+    Fld[Folder]
+    Fil[File]
   end
-  Header --> Canvas
-  Canvas -->|hover| HoverCard[Card_identificacao]
-  Canvas -->|click| Sidebar
-  API[packages_api] --> Canvas
-  API --> Sidebar
-  PG[(Postgres)] --> API
+  subgraph content [Camada conteúdo P0]
+    Sec[Section]
+    Chk[Chunk]
+  end
+  subgraph gtm [Camada GTM P1]
+    GTM[Product Persona Feature ...]
+  end
+  Fld -->|contains| Fld
+  Fld -->|contains| Fil
+  Fil -->|contains| Sec
+  Sec -->|contains| Chk
+  Chk -->|mentions| GTM
+  Fil -->|linksTo| Fil
 ```
 
-| Elemento | Regra |
-|----------|--------|
-| **Tamanho do nó** | `val = sqrt(degree + 1) * k`, `degree = in + out`; bônus `+2` no grau efetivo se `node_type === Document` |
-| **Cor do nó** | Paleta fixa por `node_type` em `graph-theme.ts` |
-| **Cor da aresta** | Paleta por `edge_type`; `mentions` pode usar traço tracejado no canvas |
-| **Espessura da aresta** | `1 + log(1 + weight)` com weight default 1 |
-| **Hover** | Card: `label`, `node_type`, `node_id`, props cruciais (`path`, `doc_type`, `name`) |
-| **Clique** | **`mat-sidenav`** lateral (~400–480px, `mode="over"`): conteúdo completo por tipo de nó |
-| **Legenda** | Canto inferior — cores de nó e aresta |
+### Tipos de nó
 
-**Performance:** snapshot default `maxNodes=300`, `maxEdges=600`; acima disso, API devolve subgrafo por `seed` + `hops` ou filtros.
+| Tipo | Papel | Relação com hoje | Propriedades chave |
+|------|--------|------------------|-------------------|
+| **`Folder`** | Diretório no corpus | **Novo** | `path` (dir relativo), `name` |
+| **`File`** | Arquivo `.md` ingerido | Substitui alias de `Document` | `path`, `doc_type`, `title`, `content_hash` |
+| **`Section`** | Bloco sob heading | Mantém | `heading`, `level`, `ordinal` |
+| **`Chunk`** | Unidade de indexação / trecho | Mantém + **âncoras** | `heading`, `text`, `start_line`, `end_line`, `path` |
+| **GTM** (`Product`, …) | Entidades de negócio | Mantém | como hoje |
 
-**Filtro default na UI:** ocultar `Chunk` e `Section` (grafo “semântico”); toggle “Mostrar estrutura P0”.
+### Migração `Document` → `File`
 
----
+| Estratégia | Prós | Contras |
+|----------|------|---------|
+| **A — Renomear tipo** (`node_type = 'File'`) | Modelo limpo | Breaking change em queries/MCP; migration SQL |
+| **B — Dual label** (ingest grava `File`, UI aceita `Document`) | Transição suave | Dívida técnica curta |
+| **Recomendado:** **A** com migration `UPDATE nodes SET node_type = 'File' WHERE node_type = 'Document'` + atualizar ontologia, ingest, theme, filtros | Alinhado ao pedido do usuário | Uma PR de migração |
 
-## Detalhe do nó (sidebar)
+`STRUCTURAL_NODE_TYPES` passa a: `["Folder", "File", "Section", "Chunk"]`.
 
-| `node_type` | Conteúdo na sidebar |
-|-------------|---------------------|
-| `Document` | Metadados + sections/chunks em accordion; Markdown renderizado |
-| `Section` / `Chunk` | Heading, ids, texto integral, link para documento pai |
-| GTM | `properties` + chunks citados (arestas `mentions` incoming) + doc de origem |
-| Qualquer | Lista de arestas incidentes clicáveis → foca vizinho no grafo |
+### Arestas
 
-Render: `ngx-markdown` (ou `marked` com sanitização Angular); **sem** HTML raw não sanitizado (evitar XSS).
-
----
-
-## API REST (contratos alvo)
-
-Base dev: `http://localhost:3001/api/v1`. **Somente leitura.**
-
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| `GET` | `/health` | `{ ok: true }` |
-| `GET` | `/stats` | Mesmo shape que `kg_stats` |
-| `GET` | `/graph` | Query: `seed?`, `hops?` (0–2), `nodeTypes[]`, `docType?`, `limit?` → `{ nodes[], links[] }` |
-| `GET` | `/nodes/:nodeId` | Detalhe + `incidentEdges` + `relatedChunks` |
-| `GET` | `/search` | Query: `q` → nós por `label` / `properties.path` |
-
-**DTO de visualização:**
-
-```ts
-interface GraphNodeDTO {
-  id: string;
-  label: string;
-  type: string;
-  val: number;
-  color?: string;
-  x?: number;
-  y?: number;
-}
-interface GraphLinkDTO {
-  source: string;
-  target: string;
-  type: string;
-  color?: string;
-}
-```
-
-Schemas Zod em `packages/core/src/explorer/` (exportados por `@kg/core`).
+| Aresta | Uso |
+|--------|-----|
+| `contains` | `Folder→Folder`, `Folder→File`, `File→Section`, `Section→Chunk` |
+| `linksTo` | `File→File` (wikilinks) |
+| `mentions` | `Chunk→GTM` |
+| GTM | inalterado |
 
 ---
 
-## Estrutura do repositório (delta)
-
-```text
-knowledge-graph-poc/
-  packages/
-    core/
-      src/ports/graph-read.ts
-      src/explorer/graph-theme.ts
-      src/explorer/schemas.ts
-    adapter-postgres/
-      src/repositories/graph-read-repository.ts
-    api/
-      src/server.ts
-      src/routes/graph.ts
-      src/routes/nodes.ts
-      src/routes/stats.ts
-    web/                              # Angular 19.2.0 application
-      angular.json
-      src/
-        app/
-          app.config.ts
-          app.routes.ts
-          app.component.ts
-          core/
-            services/graph-explorer.service.ts
-            services/node-detail.service.ts
-          features/
-            graph-explorer/
-              graph-explorer.component.ts
-              graph-canvas/
-                force-graph.component.ts    # wrapper force-graph
-              graph-filters/
-                graph-filters.component.ts
-              graph-legend/
-                graph-legend.component.ts
-              node-hover-dialog/
-                node-hover-dialog.component.ts
-              node-detail-sidenav/
-                node-detail-sidenav.component.ts
-        environments/
-          environment.ts                  # apiUrl
-          environment.development.ts
-  docs/
-    10-explorador-grafo.md
-  docker/
-    docker-compose.dev.yml    # profile explorer: kg-api, kg-web
-```
-
-**Scripts npm alvo:**
-
-| Script | Ação |
-|--------|------|
-| `pnpm explorer:api` | Fastify com `--env-file=.env` |
-| `pnpm explorer:web` | `ng serve` em `packages/web` (proxy `/api` → 3001 via `angular.json`) |
-| `pnpm explorer:build` | `ng build` production |
-| `pnpm explorer:up` | Postgres + profile explorer |
-| `pnpm test:explorer` | unit API (Vitest) + Angular unit (Karma/Jasmine ou Vitest Angular) + Playwright smoke |
-
----
-
-## Docker (dev)
+## Layout da UI (alvo)
 
 ```mermaid
 flowchart LR
-  DevPg[(postgres_5432)]
-  API[kg_api_3001]
-  Web[kg_web_4200]
-  Browser[Navegador]
-  DevPg --> API
-  API --> Web
-  Web --> Browser
+  subgraph layout [Graph Explorer v2]
+    Tree[CorpusTreeSidenav_esquerda_260px]
+    Content[FileContentPanel_centro_360px]
+    Graph[ForceGraphCanvas_flex1]
+    Detail[NodeDetailSidenav_direita_440px_opcional]
+  end
+  Tree -->|select file| Content
+  Tree -->|select file| Graph
+  Content -->|click trecho| Graph
+  Graph -->|click node| Tree
+  Graph -->|click node| Detail
 ```
 
-| Serviço | Porta | Profile |
-|---------|-------|---------|
-| `postgres` | 5432 | default |
-| `kg-api` | 3001 | `explorer` |
-| `kg-web` | **4200** | `explorer` (`ng serve --host 0.0.0.0`) |
+| Região | Componente Angular | Comportamento |
+|--------|-------------------|---------------|
+| **Esquerda** | `CorpusTreeComponent` | `mat-tree` ou lista aninhada; raiz = `corpus/`; ícone pasta/arquivo; busca rápida opcional |
+| **Centro** (novo) | `FileContentPanelComponent` | Markdown fonte ou preview; blocos por Section/Chunk com `data-chunk-id`; scroll sync |
+| **Centro-direita** | `ForceGraphComponent` (existente) | Grafo; highlight ego-network; dim em hover (já implementado) |
+| **Direita** | `NodeDetailSidenavComponent` (existente) | Metadados + chunks GTM; abre em nó GTM ou duplo painel |
+
+**Filtros:** mover para drawer colapsável ou toolbar — a árvore ocupa o lugar dos filtros atuais à esquerda; filtros de `node_type` permanecem acessíveis (chips na toolbar).
 
 ---
 
-## Fase 0 — Fundação explorer
+## Fluxos de interação
 
-**Entregáveis:** pacotes `api` + `web`, [docs/10-explorador-grafo.md](docs/10-explorador-grafo.md), profile `explorer`, env vars.
-
-| # | Tarefa | Testes |
-|---|--------|--------|
-| 0.1 | Criar `packages/api` (Fastify) | `pnpm build` |
-| 0.2 | Criar `packages/web` com **`ng new` Angular 19.2.0** — standalone, SCSS, routing, **sem** SSR | `ng version` = 19.2.x |
-| 0.3 | Pin `@angular/*` **19.2.0**; adicionar Angular Material 19 | `ng build` |
-| 0.4 | Proxy dev em `angular.json`: `/api` → `http://localhost:3001` | smoke `ng serve` |
-| 0.5 | `docker-compose.dev.yml` — `kg-api`, `kg-web` (profile `explorer`, porta 4200) | compose healthy |
-| 0.6 | `.env.example`: `API_PORT`, `GRAPH_MAX_*`; `environment.ts` com `apiUrl` | — |
-| 0.7 | Documentar stack Angular em `docs/10-explorador-grafo.md` | revisão |
-
----
-
-## Fase 1 — Ports e queries Postgres
-
-Reutilizar padrão CTE de [graph-expansion-repository.ts](packages/adapter-postgres/src/repositories/graph-expansion-repository.ts).
-
-| # | Tarefa | Testes |
-|---|--------|--------|
-| 1.1 | Port `GraphReadPort.getSnapshot(filters)` | unit: mock |
-| 1.2 | Port `NodeDetailPort.getById(nodeId)` | unit: mock |
-| 1.3 | `PostgresGraphReadRepository` — snapshot + detalhe com JOINs `documents`/`chunks` | integration: corpus |
-| 1.4 | Cálculo `val` (grau + bônus Document) no adapter | unit: fórmula |
-| 1.5 | `searchNodes(q, limit)` — ILIKE `label` e `properties->>'path'` | integration |
-
----
-
-## Fase 2 — API HTTP
-
-| # | Tarefa | Testes |
-|---|--------|--------|
-| 2.1 | Fastify + `@fastify/cors` (origem `http://localhost:4200`) | — |
-| 2.2 | Rotas `/health`, `/stats`, `/graph`, `/nodes/:id`, `/search` | integration: inject/supertest |
-| 2.3 | Validação query Zod (`hops` 0–2, `limit` ≤ 500) | unit: 400 inválido |
-| 2.4 | Erros JSON padronizados `{ error, code }` | unit |
-| 2.5 | `pnpm explorer:api` | curl smoke |
-
----
-
-## Fase 3 — Shell UI Angular (layout GitNexus-like)
-
-| # | Tarefa | Testes |
-|---|--------|--------|
-| 3.1 | `GraphExplorerComponent` — layout Material: toolbar (stats), canvas `flex-1`, `mat-sidenav` à direita | `TestBed` + `ComponentFixture` |
-| 3.2 | `GraphExplorerService` — `HttpClient` → `/graph`, signals `loading`/`error`/`graphData` | unit: `HttpClientTestingModule` |
-| 3.3 | `GraphFiltersComponent` — `mat-chip-listbox` / checkboxes por `node_type`, `doc_type`, botão Recarregar | unit |
-| 3.4 | Busca na toolbar → `/search` → emite `focusNodeId` para o canvas | Playwright smoke |
-| 3.5 | Importar `BrowserAnimationsModule`; tema Material custom (CSS variables alinhadas a `graph-theme.ts`) | — |
-
----
-
-## Fase 4 — Canvas force-graph (estética)
-
-| # | Tarefa | Testes |
-|---|--------|--------|
-| 4.1 | `ForceGraphComponent` — `AfterViewInit`: instanciar `ForceGraph` (pacote `force-graph`) no container; `@Input() graphData` | unit: mock `graphData` |
-| 4.2 | `nodeVal(d)` ← `d.val` do DTO; `nodeColor` / `linkColor` importados de `@kg/core` `graph-theme` | unit: cores por tipo |
-| 4.3 | `onNodeHover` / `onNodeClick` → `@Output()` para o container | unit |
-| 4.4 | Setas direcionais (`linkDirectionalArrowLength`); `linkLineDash` para `mentions` | visual QA |
-| 4.5 | `nodeLabel` truncado; zoom para exibir labels | — |
-| 4.6 | `GraphLegendComponent` — lista estática tipo → cor | snapshot |
-| 4.7 | Toolbar canvas: pause/resume simulation, reset zoom (`zoomToFit`) | — |
-| 4.8 | (Fallback) Se wrapper `force-graph` bloquear: migrar para `@swimlane/ngx-graph` com `nodeTemplate` custom | spike documentado em Fase 0 |
-
----
-
-## Fase 5 — Interações
-
-| # | Tarefa | Testes |
-|---|--------|--------|
-| 5.1 | Hover → `NodeHoverDialogComponent` (`MatDialog` ou overlay posicionado no cursor) com props cruciais | unit |
-| 5.2 | Click → abre `mat-sidenav` + `NodeDetailService.getById()` | Playwright |
-| 5.3 | Links “Ir para nó” na sidenav → `ForceGraphComponent.centerAt(id)` via `@ViewChild` | Playwright |
-| 5.4 | Botão “Expandir vizinhos” → merge subgraph (`/graph?seed=&hops=1`) no signal `graphData` | integration + manual |
-| 5.5 | ESC / backdrop fecha sidenav; seleção mantida no grafo | unit |
-| 5.6 | Markdown no detalhe via `ngx-markdown` | snapshot |
-
----
-
-## Fase 6 — QA, CI e operação
-
-| # | Tarefa | Testes |
-|---|--------|--------|
-| 6.1 | README — seção Graph Explorer, screenshots | — |
-| 6.2 | CI job `explorer` — build + API integration + Playwright | GitHub Actions |
-| 6.3 | Cobertura ≥80% `packages/api` (Vitest); ≥70% services + components críticos em `web` (Jasmine ou Vitest Angular) | coverage report |
-| 6.4 | Atualizar [docs/08-plano-poc.md](docs/08-plano-poc.md) — UI explorador referenciada | — |
-| 6.5 | Checklist manual: cores por tipo; clique `Competitor` mostra menções | QA doc |
-
----
-
-## Fluxo de dados
+### 1. Seleção de arquivo na árvore
 
 ```mermaid
 sequenceDiagram
-  participant Human as Humano_Browser
-  participant Web as packages_web
-  participant API as packages_api
-  participant Core as GraphReadPort
-  participant PG as Postgres
+  participant User
+  participant Tree as CorpusTree
+  participant API
+  participant Content as FileContentPanel
+  participant Graph as ForceGraph
 
-  Human->>Web: abre localhost_4200
-  Web->>API: GET /graph
-  API->>Core: getSnapshot
-  Core->>PG: SELECT nodes edges
-  PG-->>Core: rows
-  Core-->>API: GraphSnapshot
-  API-->>Web: nodes links
-  Web-->>Human: force_graph
-  Human->>Web: click node
-  Web->>API: GET /nodes/:id
-  API->>Core: getNodeDetail
-  Core->>PG: node chunks edges
-  API-->>Web: NodeDetailDTO
-  Web-->>Human: sidebar Markdown
+  User->>Tree: click arquivo.md
+  Tree->>API: GET /files/{path}
+  API-->>Content: raw markdown + chunk map
+  Content-->>User: render painel
+  Tree->>Graph: focus seed = fileNodeId
+  Graph->>API: GET /graph?seed=&hops=1&types=...
+  Graph-->>User: highlight file + vizinhos
 ```
 
----
+### 2. Clique em trecho → nó Chunk
 
-## Paleta inicial (`graph-theme.ts`)
+1. Ingest persiste `start_line` / `end_line` por chunk (calculado no `chunkDocument` a partir do body acumulado).
+2. Painel renderiza com spans ou blocos `id="chunk-{chunkId}"`.
+3. `click` / `selectionchange` resolve `chunkId` → `GraphExplorerService.focusNode(chunkId)` + highlight só Chunk + arestas incidentes.
+4. Árvore **não** muda de arquivo (já está no arquivo correto).
 
-**Nós:**
+### 3. Clique no grafo → árvore
 
-| `node_type` | Cor |
-|-------------|-----|
-| `Document` | `#3b82f6` |
-| `Section` | `#93c5fd` |
-| `Chunk` | `#cbd5e1` |
-| `Product` | `#8b5cf6` |
-| `Competitor` | `#ef4444` |
-| `Persona` / `ICP` | `#f59e0b` |
-| `Feature` | `#10b981` |
-| default GTM | `#64748b` |
-
-**Arestas:**
-
-| `edge_type` | Cor | Notas |
-|-------------|-----|-------|
-| `contains` | `#94a3b8` | fino |
-| `linksTo` | `#2563eb` | navegação |
-| `mentions` | `#a855f7` | tracejado |
-| `competesWith` | `#dc2626` | grosso |
-| `targetsICP` | `#d97706` | — |
-| default GTM | `#64748b` | — |
+- Nó `File` / `Folder`: expandir path na árvore e carregar painel se `File`.
+- Nó `Chunk`: abrir arquivo pai na árvore + painel + scroll até bloco do chunk.
+- Nó GTM: sidenav direita (comportamento atual) + opcionalmente não alterar painel central.
 
 ---
 
-## Variáveis de ambiente (novas)
+## API REST (delta)
 
-| Variável | Default | Uso |
-|----------|---------|-----|
-| `API_PORT` | `3001` | bind Fastify |
-| `NG_APP_API_URL` | `http://localhost:3001/api/v1` | injetado em `environment.ts` (build Angular); em Docker passar como env no `ng build` |
-| `GRAPH_MAX_NODES` | `300` | cap snapshot |
-| `GRAPH_MAX_EDGES` | `600` | cap snapshot |
-| `DATABASE_URL` | (existente) | pool Postgres |
+Base: `http://localhost:3001/api/v1`
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| `GET` | `/corpus/tree` | Árvore `{ name, path, kind: 'folder'\|'file', children?, nodeId? }` derivada de `KG_WORKSPACE` + nós `Folder`/`File` |
+| `GET` | `/files/*path` | Conteúdo bruto do `.md` + `{ docId, fileNodeId, chunks: [{ chunkId, sectionId, heading, startLine, endLine }] }` |
+| `GET` | `/graph` | (existente) + query `highlightMode=ego&seed=` otimizado para seleção arquivo/chunk |
+| `GET` | `/nodes/:id` | (existente) + para `Chunk` incluir `parentFilePath`, `lineRange` |
+
+**Segurança:** paths normalizados; rejeitar `..`; só leitura sob `corpus/`.
 
 ---
 
-## Ordem de execução
+## Fase 0 — Contratos e decisões
 
-```mermaid
-flowchart LR
-  E0[Fase_0] --> E1[Fase_1]
-  E1 --> E2[Fase_2]
-  E2 --> E3[Fase_3]
-  E3 --> E4[Fase_4]
-  E4 --> E5[Fase_5]
-  E5 --> E6[Fase_6]
-```
+| # | Tarefa | Saída |
+|---|--------|-------|
+| 0.1 | Atualizar [ontology.ts](packages/core/src/graph/ontology.ts): `Folder`, `File`; deprecar `Document` | PR design |
+| 0.2 | Zod schemas: `CorpusTreeNode`, `FileContentDTO`, `ChunkAnchorDTO` em `packages/core/src/explorer/` | tipos exportados |
+| 0.3 | Port `CorpusReadPort` (tree, fileByPath, chunksByDocId) | interface em `core/ports` |
+| 0.4 | ADR curto em [docs/10-explorador-grafo.md](docs/10-explorador-grafo.md) — seção “Navegação corpus” | doc |
 
-Fase 3 pode usar **mock JSON** até Fase 2 pronta; aceite final exige API + corpus ingerido.
+**Testes:** unit Zod; validação paths.
+
+---
+
+## Fase 1 — Ingest e Postgres
+
+| # | Tarefa | Detalhe |
+|---|--------|---------|
+| 1.1 | Durante `walkMarkdownFiles`, criar nós `Folder` por segmento de path | `contains` pai→filho |
+| 1.2 | Nó `File` por `.md` (substituir `Document`) | `edge` Folder→File |
+| 1.3 | Manter Section/Chunk; `File→Section→Chunk` | contains |
+| 1.4 | Calcular `start_line`/`end_line` no chunker | propriedades no nó Chunk |
+| 1.5 | Migration SQL + re-ingest corpus | script documentado |
+
+**Testes:** integration ingest — contagens Folder/File; proveniência linha; `pnpm kg ingest` idempotente.
+
+---
+
+## Fase 2 — API
+
+| # | Tarefa |
+|---|--------|
+| 2.1 | `PostgresCorpusReadRepository` |
+| 2.2 | Rotas `/corpus/tree`, `/files/*` |
+| 2.3 | Estender `/graph` com preset `fileNeighborhood` / `chunkNeighborhood` |
+| 2.4 | Testes supertest + integration |
+
+---
+
+## Fase 3 — UI: árvore de corpus
+
+| # | Tarefa |
+|---|--------|
+| 3.1 | `CorpusTreeComponent` — `HttpClient` → `/corpus/tree` |
+| 3.2 | Layout: `mat-sidenav` esquerda fixa (~260px), tema dark |
+| 3.3 | Seleção single-file; emit `fileSelected(path, nodeId)` |
+| 3.4 | Ícones Material `folder` / `description` |
+| 3.5 | Playwright: árvore visível, click arquivo dispara request `/files/` |
+
+---
+
+## Fase 4 — UI: painel de conteúdo
+
+| # | Tarefa |
+|---|--------|
+| 4.1 | `FileContentPanelComponent` — markdown monospace ou preview ngx-markdown |
+| 4.2 | Decorar blocos com `data-chunk-id` a partir de anchors |
+| 4.3 | `click` em bloco → `focusNode(chunkId)` + classe `.chunk-selected` |
+| 4.4 | Scroll into view quando foco vem do grafo |
+| 4.5 | Playwright: após abrir arquivo, click bloco → tooltip/grafo não some (regressão hover) |
+
+---
+
+## Fase 5 — Sincronização grafo
+
+| # | Tarefa |
+|---|--------|
+| 5.1 | `selectFile(nodeId)` → subgraph seed File, hops=1, edgeTypes filtrados |
+| 5.2 | `selectChunk(nodeId)` → highlight Chunk + Section pai + File; dim demais |
+| 5.3 | Click grafo em File/Chunk → sync tree + panel |
+| 5.4 | Manter simulação estática + hover dim (regressão) |
+
+---
+
+## Fase 6 — QA, docs, CI
+
+| # | Tarefa |
+|---|--------|
+| 6.1 | E2E: árvore → arquivo → painel → click trecho → sidenav/chunk |
+| 6.2 | Regra [.cursor/rules/manual-ui-verification.mdc](../rules/manual-ui-verification.mdc) — incluir checklist árvore/painel |
+| 6.3 | Atualizar `docs/04-ontologia-grafo.md` (Folder, File, âncoras) |
+| 6.4 | CI `test:explorer` cobre novas rotas |
+
+---
+
+## Paleta visual (extensão `graph-theme.ts`)
+
+| `node_type` | Cor sugerida | Ícone árvore |
+|-------------|--------------|--------------|
+| `Folder` | `#c5c5c5` | folder |
+| `File` | `#4fc3f7` | description |
+| `Section` | `#81d4fa` | (só no grafo) |
+| `Chunk` | `#9e9e9e` | (só no grafo / blocos painel) |
+| GTM | (inalterado) | — |
 
 ---
 
@@ -419,29 +284,44 @@ Fase 3 pode usar **mock JSON** até Fase 2 pronta; aceite final exige API + corp
 
 | Risco | Mitigação |
 |-------|-----------|
-| Grafo poluído com Chunks | Filtro default oculta estrutura P0 |
-| Canvas lento >500 nós | Limits na API; expansão incremental |
-| CORS / URL em Docker | `environment.ts` + proxy `angular.json` em dev |
-| XSS em Markdown | `ngx-markdown` sanitizado / bypassSecurityTrustHtml proibido |
-| Duplicar MCP | ports em `@kg/core`; Angular não chama MCP |
-| Zone.js + force-graph performance | `NgZone.runOutsideAngular` na simulação d3; reentrar zone só em hover/click |
-| Pin Angular drift | `pnpm overrides` ou `resolutions` travando `@angular/core@19.2.0` |
+| Migração `Document`→`File` quebra MCP/CLI | Atualizar ontologia + testes numa PR; alias temporário em leitura |
+| Chunk sem linha exata | Calcular no ingest; fallback: focar Section |
+| Árvore grande (31+ arquivos) | Virtual scroll `cdk-virtual-scroll`; lazy load filhos |
+| Path traversal | Normalizar paths na API |
+| Layout apertado 3 colunas | Painel conteúdo colapsável; persistir larguras em `localStorage` |
 
 ---
 
 ## Métricas de aceite
 
-| Métrica | Meta |
-|---------|------|
-| Grafo visível após `explorer:up` | < 3s (corpus já ingerido) |
-| Clique → sidebar com conteúdo | 100% tipos no corpus |
-| Distinção `competesWith` vs `linksTo` | legível (cor + legenda) |
-| CI | API integration + 1 Playwright verde |
+| Cenário | Critério |
+|---------|----------|
+| Navegar `corpus/gtm/playbook.md` na árvore | Painel mostra conteúdo idêntico ao disco |
+| Mesmo clique | Grafo destaca nó `File` + arestas `contains`/`linksTo` visíveis |
+| Clique em parágrafo/chunk no painel | Grafo destaca nó `Chunk` correto (validar `chunk_id` no E2E) |
+| Clique Chunk no grafo | Painel scrolla até o bloco |
+| Regressão | Hover não apaga grafo; layout congela após simulação |
 
 ---
 
-## Execução sugerida
+## Ordem de execução
 
-Após aprovação: orquestração por **subagents** (uma fase por agente; paralelizar Fase 3 com mock + Fase 1 quando contratos Zod estiverem fixos). Não alterar [poc_knowledge_graph_d173250f.plan.md](./poc_knowledge_graph_d173250f.plan.md).
+```mermaid
+flowchart LR
+  N0[Fase_0_contratos] --> N1[Fase_1_ingest]
+  N1 --> N2[Fase_2_API]
+  N2 --> N3[Fase_3_arvore]
+  N3 --> N4[Fase_4_painel]
+  N4 --> N5[Fase_5_sync_grafo]
+  N5 --> N6[Fase_6_QA]
+```
+
+**Paralelização possível:** Fase 3 com mock tree JSON enquanto Fase 2 não estiver pronta.
+
+---
+
+## Execução
+
+Após aprovação: implementar por fases com **testes manuais (browser embutido) + Playwright** em cada fase — conforme regra `manual-ui-verification.mdc`.
 
 **Aprova o plano?** (responda: aprovar / pedir alteração / recusar)

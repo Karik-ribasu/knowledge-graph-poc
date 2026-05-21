@@ -37,27 +37,36 @@ pnpm explorer:up
 
 ---
 
-## 2. Layout da interface
+## 2. Layout da interface (navegação corpus)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│ Toolbar: título · stats · busca de nó (autocomplete)        │
-├──────────┬──────────────────────────────────────┬───────────┤
-│ Filtros  │ Canvas force-graph + legenda         │ (hover)   │
-│ (painel) │                                      │ dialog    │
-├──────────┴──────────────────────────────────────┴───────────┤
-│ Sidenav direita: detalhe do nó (Markdown, chunks, arestas)  │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│ Toolbar: título · stats · Filtros (menu) · Recarregar · busca            │
+├────────────┬─────────────────┬──────────────────────────┬──────────────┤
+│ Corpus     │ Conteúdo do     │ Canvas force-graph       │ Sidenav      │
+│ tree       │ arquivo (.md)   │ + legenda + hover card   │ detalhe GTM  │
+│ (esquerda) │ (centro)        │ (flex)                   │ (direita)    │
+└────────────┴─────────────────┴──────────────────────────┴──────────────┘
 ```
 
 | Área | Componente | Função |
 |------|------------|--------|
-| Toolbar | `GraphExplorerComponent` | Título, contadores (`/stats`), busca |
-| Filtros | `GraphFiltersComponent` | Tipos de nó, `doc_type`, ocultar P0 |
-| Canvas | `ForceGraphComponent` | Simulação d3-force, pan/zoom, clique |
-| Legenda | `GraphLegendComponent` | Cores de nós e arestas (`graph-theme`) |
-| Hover | `NodeHoverDialogComponent` | Resumo rápido ao passar o mouse |
-| Detalhe | `NodeDetailSidenavComponent` | Conteúdo completo após clique |
+| Toolbar | `GraphExplorerComponent` | Título, stats, filtros, busca |
+| Árvore | `CorpusTreeComponent` | Pastas/arquivos (`GET /corpus/tree`) |
+| Painel arquivo | `FileContentPanelComponent` | Markdown com linhas; clique → Chunk |
+| Canvas | `ForceGraphComponent` | Grafo; vizinhança ao selecionar arquivo/chunk |
+| Legenda | `GraphLegendComponent` | Cores (`Folder`, `File`, GTM, …) |
+| Detalhe | `NodeDetailSidenavComponent` | Metadados GTM / expandir vizinhos |
+
+### Ontologia filesystem
+
+| Tipo | Papel |
+|------|--------|
+| `Folder` | Diretório no corpus |
+| `File` | Arquivo `.md` (substitui `Document` após re-ingest) |
+| `Section` / `Chunk` | Estrutura e trechos (chunks com `start_line` / `end_line`) |
+
+Após alterar ingest: `pnpm kg ingest ./corpus` para criar pastas/arquivos no grafo.
 
 ---
 

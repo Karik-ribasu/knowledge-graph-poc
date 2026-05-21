@@ -1,0 +1,29 @@
+{
+  "venture_id": "v-b4u-bet-001",
+  "brand_name": "B4U.bet",
+  "positioning": "A plataforma premium onde inteligência esportiva encontra contexto — stats, odds e narrativa com ética editorial, para quem quer entender o jogo antes de apostar.",
+  "primary_archetype": "Sage",
+  "secondary_archetype": "Explorer",
+  "brand_promise": "Inteligência confiável em tempo real: IA que interpreta, humanos que validam, dados que citam fonte.",
+  "personality_traits": [
+    "Sofisticado e preciso",
+    "Brasileiro com ambição global",
+    "Transparente e ético",
+    "Energético sem hype predatório",
+    "Tecnicamente fluente mas acessível"
+  ],
+  "values": [
+    "Credibilidade editorial",
+    "Transparência comercial",
+    "Jogo responsável",
+    "Excelência em dados",
+    "Comunidade respeitosa"
+  ],
+  "anti_values": [
+    "Clickbait",
+    "Promessas de lucro",
+    "Opacidade de afiliados",
+    "IA como oráculo"
+  ],
+  "competitive_context": "Entre SofaScore (utilitário) e Action Network (betting-adjacent): B4U ocupa mídia+IA+dados com governança premium, BR-first."
+}

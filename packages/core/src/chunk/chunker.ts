@@ -110,6 +110,8 @@ function chunkSection(
     text,
     tokenCount: estimateTokens(text),
     path: options.path,
+    startLine: 0,
+    endLine: 0,
   }));
 }
 

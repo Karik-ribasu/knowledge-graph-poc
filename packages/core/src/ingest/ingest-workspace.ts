@@ -1,6 +1,12 @@
 import { readdir, readFile } from "node:fs/promises";
 import { basename, extname, join, relative, resolve } from "node:path";
+import { attachLineRangesToChunks } from "../corpus/line-anchors.js";
 import { contentHash, docIdFromPath, edgeIdFromParts } from "../domain/ids.js";
+import {
+  ensureFolderChain,
+  linkFileToParentFolder,
+  resetFolderCache,
+} from "./folder-graph.js";
 import type {
   DocumentRecord,
   EdgeRecord,
@@ -72,6 +78,8 @@ export async function ingestWorkspace(options: IngestWorkspaceOptions): Promise<
   const entityExtractor: EntityExtractor =
     options.entityExtractor ?? createEntityExtractor("rules");
 
+  resetFolderCache();
+
   const absolutePaths = await walkMarkdownFiles(corpusDir);
   const pathIndex = buildPathIndex(absolutePaths, workspaceRoot);
   const pendingLinks: Array<{ sourceDocId: string; sourcePath: string; targetSlug: string }> =
@@ -95,10 +103,15 @@ export async function ingestWorkspace(options: IngestWorkspaceOptions): Promise<
 
     const docId = docIdFromPath(relPath);
     const parsed = parseMarkdown(raw, { relativePath: relPath });
-    const { sections, chunks } = chunkDocument(parsed, {
+    const folderStats = await ensureFolderChain(relPath, options.store);
+    stats.nodesWritten += folderStats.nodesWritten;
+    stats.edgesWritten += folderStats.edgesWritten;
+
+    let { sections, chunks } = chunkDocument(parsed, {
       docId,
       path: relPath,
     });
+    chunks = attachLineRangesToChunks(chunks, raw);
 
     const doc: DocumentRecord = {
       docId,
@@ -110,18 +123,21 @@ export async function ingestWorkspace(options: IngestWorkspaceOptions): Promise<
     await options.store.upsertDocument(doc);
     stats.documentsProcessed += 1;
 
-    const docNode: NodeRecord = {
+    const fileNode: NodeRecord = {
       nodeId: docId,
-      nodeType: "Document",
+      nodeType: "File",
       label: parsed.title,
       properties: {
         path: relPath,
         doc_type: parsed.docType,
+        title: parsed.title,
+        content_hash: hash,
         ...parsed.frontmatter,
       },
     };
-    await options.store.upsertNode(docNode);
+    await options.store.upsertNode(fileNode);
     stats.nodesWritten += 1;
+    stats.edgesWritten += await linkFileToParentFolder(relPath, docId, options.store);
 
     for (const section of sections) {
       await options.store.upsertSection(section);
@@ -158,6 +174,8 @@ export async function ingestWorkspace(options: IngestWorkspaceOptions): Promise<
           path: chunk.path,
           heading: chunk.heading,
           token_count: chunk.tokenCount,
+          start_line: chunk.startLine,
+          end_line: chunk.endLine,
         },
       };
       await options.store.upsertNode(chunkNode);

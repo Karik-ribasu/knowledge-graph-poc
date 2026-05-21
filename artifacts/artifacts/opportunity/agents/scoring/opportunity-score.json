@@ -1,0 +1,35 @@
+{
+  "opportunity_id": "opp-b4u-bet-2026-001",
+  "title": "B4U.bet — Global Sports Intelligence Hub",
+  "scored_at": "2026-05-20T14:05:00Z",
+  "dimensions": {
+    "market_size": {
+      "score": 22,
+      "max": 25,
+      "rationale": "TAM $4.2B com SAM $890M; mercado em expansão com regulação BR. Confidence 0.72."
+    },
+    "urgency": {
+      "score": 21,
+      "max": 25,
+      "rationale": "Janela regulatória BR + consolidação global sports+betting media. Demanda por credibilidade agora."
+    },
+    "competition": {
+      "score": 19,
+      "max": 25,
+      "rationale": "Players globais existem mas gap BR premium claro. Risco: casas com budget de conteúdo."
+    },
+    "strategic_fit": {
+      "score": 20,
+      "max": 25,
+      "rationale": "Alinhamento total ao thesis mídia+IA+esporte; venture-scale; múltiplas linhas de receita."
+    }
+  },
+  "bonuses": [
+    { "code": "multiple_signals", "points": 2, "reason": "4+ sinais independentes (regulação, mídia global, data rights, founder brief)" },
+    { "code": "regulatory_tailwind", "points": 1, "reason": "Regulação BR força transparência e jogo responsável — favorece posicionamento ético" }
+  ],
+  "penalties": [],
+  "total_score": 82,
+  "recommendation": "advance",
+  "recommendation_rationale": "Score 82 >= 75. Oportunidade venture-scale com narrativa investível (Sequoia/a16z-grade blueprint). Avançar para Add Venture."
+}

@@ -1,0 +1,20 @@
+{
+  "volume": 0,
+  "volume_title": "Intake & Briefing Interpretation",
+  "venture_id": "v-b4u-bet-001",
+  "opportunity_id": "opp-b4u-bet-2026-001",
+  "venture_name": "B4U.bet",
+  "interpreted_brief": {
+    "founder_intent": "Venture global nascida no Brasil: mídia esportiva + IA + dados + comunidade. NÃO casa de apostas, NÃO tipster, NÃO afiliado predatório.",
+    "positioning_constraints": [
+      "IA = consolidação e interpretação, não 'previsora'",
+      "Análises finais = IA + jornalismo + estatística + edição humana",
+      "Transparência editorial e jogo responsável como produto"
+    ],
+    "benchmarks": ["The Athletic", "FiveThirtyEight", "Action Network", "SofaScore", "Opta", "ESPN Bet"],
+    "geographic_priority": ["Brazil", "LATAM", "Global English export"],
+    "revenue_vectors": ["subscription", "membership", "qualified ads", "data/API", "B2B analytics", "governed affiliates"]
+  },
+  "confidence": 0.91,
+  "gaps_flagged": []
+}

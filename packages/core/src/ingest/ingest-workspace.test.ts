@@ -121,6 +121,12 @@ Linked back [[a]].
     expect(first.documentsProcessed).toBe(2);
     expect(first.chunksWritten).toBeGreaterThan(0);
     expect([...store.edges.values()].some((e) => e.edgeType === "linksTo")).toBe(true);
+    expect([...store.nodes.values()].some((n) => n.nodeType === "Folder")).toBe(true);
+    expect([...store.nodes.values()].filter((n) => n.nodeType === "File")).toHaveLength(2);
+    const chunkWithLines = [...store.chunks.values()].find(
+      (c) => c.startLine != null && c.endLine != null,
+    );
+    expect(chunkWithLines).toBeDefined();
 
     const second = await ingestWorkspace({
       workspaceRoot: root,

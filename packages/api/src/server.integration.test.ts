@@ -46,6 +46,7 @@ describe("Graph Explorer API (integration)", () => {
       GRAPH_MAX_NODES: "300",
       GRAPH_MAX_EDGES: "600",
       CORS_ORIGIN: "http://localhost:4200",
+      KG_WORKSPACE: repoRoot,
     });
     const app = await buildServer(env);
 
@@ -61,7 +62,7 @@ describe("Graph Explorer API (integration)", () => {
 
     const graph = await app.inject({
       method: "GET",
-      url: "/api/v1/graph?nodeTypes=Document&nodeTypes=Competitor&limit=50",
+      url: "/api/v1/graph?nodeTypes=File&nodeTypes=Competitor&limit=50",
     });
     expect(graph.statusCode).toBe(200);
     const graphBody = graph.json() as { nodes: unknown[]; links: unknown[] };
@@ -101,6 +102,19 @@ describe("Graph Explorer API (integration)", () => {
     });
     expect(missingNode.statusCode).toBe(404);
     expect(missingNode.json()).toMatchObject({ code: "NOT_FOUND" });
+
+    const tree = await app.inject({ method: "GET", url: "/api/v1/corpus/tree" });
+    expect(tree.statusCode).toBe(200);
+    const treeBody = tree.json() as { name: string; kind: string; children?: unknown[] };
+    expect(treeBody.name).toBe("corpus");
+    expect(treeBody.kind).toBe("folder");
+
+    const filePath = encodeURIComponent("corpus/market/competidores.md");
+    const file = await app.inject({ method: "GET", url: `/api/v1/files/${filePath}` });
+    expect(file.statusCode).toBe(200);
+    const fileBody = file.json() as { path: string; chunks: unknown[] };
+    expect(fileBody.path).toBe("corpus/market/competidores.md");
+    expect(fileBody.chunks.length).toBeGreaterThan(0);
 
     await app.close();
   }, 120_000);

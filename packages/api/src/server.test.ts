@@ -10,6 +10,7 @@ const stubEnv: ApiEnv = {
   graphMaxEdges: 600,
   databaseUrl: "postgresql://unused:5432/unused",
   corsOrigin: "http://localhost:4200",
+  workspaceRoot: process.cwd(),
 };
 
 describe("buildServer", () => {
@@ -39,6 +40,16 @@ describe("buildServer", () => {
     const res = await app.inject({ method: "GET", url: "/api/v1/search?q=" });
     expect(res.statusCode).toBe(400);
     expect(res.json()).toMatchObject({ code: "INVALID_QUERY" });
+  });
+
+  it("rejects path traversal on files route", async () => {
+    app = await buildServer(stubEnv);
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/v1/files/..%2F..%2Fetc%2Fpasswd",
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json()).toMatchObject({ code: "INVALID_PATH" });
   });
 
   it("rejects blank nodeId before hitting the database", async () => {

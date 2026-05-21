@@ -8,6 +8,7 @@ describe("toForceGraphData", () => {
     });
     expect(data.nodes[0].color).toBe("#3b82f6");
     expect(data.links[0].dashed).toBe(true);
+    expect(data.links[0].curvature).toBeGreaterThan(0);
   });
 
   it("returns empty graph for null snapshot", () => {

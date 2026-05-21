@@ -170,9 +170,9 @@ export class PostgresGraphReadRepository implements GraphReadPort, NodeDetailPor
       `
       SELECT n.node_id, n.node_type, n.label, n.properties
       FROM nodes n
-      LEFT JOIN documents d ON d.doc_id = n.node_id AND n.node_type = 'Document'
+      LEFT JOIN documents d ON d.doc_id = n.node_id AND n.node_type IN ('File', 'Document')
       WHERE ($1::text[] IS NULL OR n.node_type = ANY($1))
-        AND ($2::text IS NULL OR d.doc_type = $2 OR n.node_type <> 'Document')
+        AND ($2::text IS NULL OR d.doc_type = $2 OR n.node_type NOT IN ('File', 'Document'))
       ORDER BY n.node_type, n.node_id
       LIMIT $3
       `,
@@ -211,9 +211,9 @@ export class PostgresGraphReadRepository implements GraphReadPort, NodeDetailPor
       SELECT n.node_id, n.node_type, n.label, n.properties, r.hop
       FROM reached r
       JOIN nodes n ON n.node_id = r.node_id
-      LEFT JOIN documents d ON d.doc_id = n.node_id AND n.node_type = 'Document'
+      LEFT JOIN documents d ON d.doc_id = n.node_id AND n.node_type IN ('File', 'Document')
       WHERE ($3::text[] IS NULL OR n.node_type = ANY($3))
-        AND ($4::text IS NULL OR d.doc_type = $4 OR n.node_type <> 'Document')
+        AND ($4::text IS NULL OR d.doc_type = $4 OR n.node_type NOT IN ('File', 'Document'))
       ORDER BY r.hop, n.node_id
       LIMIT $5
       `,
@@ -323,7 +323,7 @@ export class PostgresGraphReadRepository implements GraphReadPort, NodeDetailPor
       }));
     }
 
-    if (nodeType === "Document") {
+    if (nodeType === "File" || nodeType === "Document") {
       const row = await this.pool.query<{
         chunk_id: string;
         doc_id: string;
@@ -382,7 +382,7 @@ export class PostgresGraphReadRepository implements GraphReadPort, NodeDetailPor
     nodeId: string,
     nodeType: string,
   ): Promise<NodeDetailDTO["relatedDocuments"]> {
-    if (nodeType === "Document") {
+    if (nodeType === "File" || nodeType === "Document") {
       const row = await this.pool.query<{
         doc_id: string;
         path: string;

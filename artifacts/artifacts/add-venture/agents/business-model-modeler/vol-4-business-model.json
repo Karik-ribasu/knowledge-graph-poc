@@ -1,0 +1,30 @@
+{
+  "volume": 4,
+  "volume_title": "Business Model & Unit Economics",
+  "venture_name": "B4U.bet",
+  "revenue_streams": [
+    { "stream": "premium_subscription", "year_1_share_pct": 45, "notes": "BR pricing R$39-59/mo; annual plan" },
+    { "stream": "membership_community", "year_1_share_pct": 10, "notes": "Tier com eventos AMA, dados exclusivos" },
+    { "stream": "qualified_advertising", "year_1_share_pct": 25, "notes": "Sports brands, data tools — no ungoverned betting promos" },
+    { "stream": "data_api_b2b", "year_1_share_pct": 15, "notes": "SMB media, creators" },
+    { "stream": "governed_affiliates", "year_1_share_pct": 5, "notes": "Strict disclosure; cap % revenue" }
+  ],
+  "year_1_targets": {
+    "revenue_usd": 1800000,
+    "paying_subscribers": 22000,
+    "mrr_usd": 150000,
+    "gross_margin_pct": 58
+  },
+  "unit_economics": {
+    "cac_usd": 28,
+    "ltv_usd": 186,
+    "ltv_cac_ratio": 6.6,
+    "payback_months": 4
+  },
+  "scenarios": {
+    "base": { "year_3_revenue_usd": 12000000, "recommended": true },
+    "bull": { "year_3_revenue_usd": 22000000 },
+    "bear": { "year_3_revenue_usd": 5500000 }
+  },
+  "funding_required_12m_usd": 3200000
+}

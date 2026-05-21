@@ -17,8 +17,10 @@ import {
   contextPackSchema,
   hybridSearch,
   indexChunks,
+  ingestArtifacts,
   ingestWorkspace,
   parseBriefJson,
+  type ArtifactIngestStats,
   parseExpansionSeed,
   createEntityExtractor,
   type Brief,
@@ -49,6 +51,16 @@ export function resolveCorpusDir(workspaceRoot: string, corpusArg?: string): str
     throw new Error(`Corpus path must stay within KG_WORKSPACE: ${relative}`);
   }
   return corpusDir;
+}
+
+export function resolveArtifactsDir(workspaceRoot: string, artifactsArg?: string): string {
+  const relative = artifactsArg ?? "artifacts/artifacts";
+  const artifactsDir = resolve(workspaceRoot, relative);
+  const normalizedRoot = resolve(workspaceRoot);
+  if (!artifactsDir.startsWith(normalizedRoot)) {
+    throw new Error(`Artifacts path must stay within KG_WORKSPACE: ${relative}`);
+  }
+  return artifactsDir;
 }
 
 export async function withDatabasePool<T>(
@@ -88,6 +100,26 @@ export async function runIngestUseCase(corpusArg?: string): Promise<{
   return { workspaceRoot, corpusDir, stats };
 }
 
+export async function runIngestArtifactsUseCase(artifactsArg?: string): Promise<{
+  workspaceRoot: string;
+  artifactsDir: string;
+  stats: ArtifactIngestStats;
+}> {
+  const workspaceRoot = resolveWorkspaceRoot();
+  const artifactsDir = resolveArtifactsDir(workspaceRoot, artifactsArg);
+
+  const stats = await withDatabasePool(async (pool) => {
+    const store = new PostgresGraphStore(pool);
+    return ingestArtifacts({
+      workspaceRoot,
+      artifactsDir,
+      store,
+    });
+  });
+
+  return { workspaceRoot, artifactsDir, stats };
+}
+
 export async function runIndexUseCase(providerName?: string): Promise<{
   provider: string;
   dimensions: number;
@@ -114,7 +146,7 @@ export async function runIndexUseCase(providerName?: string): Promise<{
 export interface SearchUseCaseResult {
   query: string;
   provider: string;
-  filters: { docType?: string };
+  filters: { docType?: string; module?: string[] };
   results: Array<{
     chunk_id: string;
     score: number;
@@ -126,10 +158,16 @@ export interface SearchUseCaseResult {
 
 export async function runSearchUseCase(
   query: string,
-  options?: { docType?: string; providerName?: string; limit?: number },
+  options?: {
+    docType?: string;
+    module?: string[];
+    providerName?: string;
+    limit?: number;
+  },
 ): Promise<SearchUseCaseResult> {
   const provider = resolveEmbeddingProvider(options?.providerName);
   const docType = options?.docType;
+  const module = options?.module;
 
   const hits = await withDatabasePool(async (pool) => {
     const searchStore = new PostgresSearchStore(pool);
@@ -137,15 +175,20 @@ export async function runSearchUseCase(
       query,
       embeddingProvider: provider,
       searchStore,
-      filters: docType ? { docType } : undefined,
+      filters:
+        docType || (module && module.length > 0) ? { docType, module } : undefined,
       rrfTopK: options?.limit,
     });
   });
 
+  const filters: SearchUseCaseResult["filters"] = {};
+  if (docType) filters.docType = docType;
+  if (module && module.length > 0) filters.module = module;
+
   return {
     query,
     provider: provider.modelId,
-    filters: docType ? { docType } : {},
+    filters,
     results: mapSearchHits(hits),
   };
 }
@@ -223,6 +266,7 @@ export async function runExpandUseCase(
 export async function runPackUseCase(
   brief: Brief,
   providerName?: string,
+  options?: { artifactsOnly?: boolean },
 ): Promise<{ pack: ReturnType<typeof contextPackSchema.parse>; meta: Record<string, unknown> }> {
   const provider = resolveEmbeddingProvider(providerName);
 
@@ -235,6 +279,7 @@ export async function runPackUseCase(
       searchStore,
       graphExpansion,
       hitsPerQuery: 10,
+      artifactsOnly: options?.artifactsOnly !== false,
     });
   });
 

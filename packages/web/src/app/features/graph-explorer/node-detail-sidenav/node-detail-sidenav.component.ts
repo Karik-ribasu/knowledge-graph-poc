@@ -26,41 +26,44 @@ import { NodeDetailService } from "../../../core/services/node-detail.service";
       @if (detailData(); as d) {
         <header class="detail-header">
           <h2>{{ d.node.label }}</h2>
-          <p class="meta">{{ d.node.type }} · <code>{{ d.node.id }}</code></p>
-          <button mat-stroked-button type="button" (click)="expandNeighbors.emit(d.node.id)">
+          <p class="meta">{{ d.node.type }}</p>
+          <p class="id-line"><code>{{ d.node.id }}</code></p>
+          <button mat-stroked-button type="button" class="expand-btn" (click)="expandNeighbors.emit(d.node.id)">
             Expandir vizinhos
           </button>
         </header>
 
         @let md = propsMarkdown(d);
         @if (md) {
-          <section class="props-md">
+          <section class="props-md kg-markdown">
             <markdown [data]="md"></markdown>
           </section>
         }
 
         @if (d.relatedChunks.length) {
-          <mat-expansion-panel expanded>
+          <mat-expansion-panel expanded class="panel">
             <mat-expansion-panel-header>Chunks relacionados</mat-expansion-panel-header>
             @for (chunk of d.relatedChunks; track chunk.chunkId) {
-              <mat-expansion-panel>
+              <mat-expansion-panel class="panel nested">
                 <mat-expansion-panel-header>
                   {{ chunk.heading || chunk.chunkId }}
                 </mat-expansion-panel-header>
-                <markdown [data]="chunk.snippet"></markdown>
+                <div class="kg-markdown chunk-body">
+                  <markdown [data]="chunk.snippet"></markdown>
+                </div>
               </mat-expansion-panel>
             }
           </mat-expansion-panel>
         }
 
         @if (d.incidentEdges.length) {
-          <mat-expansion-panel expanded>
+          <mat-expansion-panel expanded class="panel">
             <mat-expansion-panel-header>Arestas incidentes</mat-expansion-panel-header>
             <mat-nav-list>
               @for (edge of d.incidentEdges; track edge.edgeId) {
-                <button mat-list-item type="button" (click)="onEdgeClick(edge)">
+                <button mat-list-item type="button" class="edge-item" (click)="onEdgeClick(edge)">
                   <span matListItemTitle>{{ edge.edgeType }}</span>
-                  <span matListItemLine>
+                  <span matListItemLine class="edge-line">
                     {{ edge.direction === "outgoing" ? "→" : "←" }}
                     {{ neighborId(edge) }}
                   </span>
@@ -76,29 +79,74 @@ import { NodeDetailService } from "../../../core/services/node-detail.service";
     `
       :host {
         display: block;
-        padding: 1rem;
+        padding: 1rem 1.1rem;
         overflow-y: auto;
         height: 100%;
         box-sizing: border-box;
+        background: #252526;
+        color: #cccccc;
       }
       .detail-header h2 {
-        margin: 0 0 0.25rem;
-        font-size: 1.1rem;
+        margin: 0 0 0.35rem;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #ffffff;
+        line-height: 1.35;
       }
       .meta {
-        color: #64748b;
+        color: #9d9d9d;
         font-size: 0.85rem;
+        margin: 0 0 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .id-line {
+        margin: 0 0 0.75rem;
+      }
+      .id-line code {
+        font-family: Consolas, monospace;
+        font-size: 0.78rem;
+        color: #d4d4d4;
+        background: #3c3c3c;
+        padding: 0.2rem 0.4rem;
+        word-break: break-all;
+        display: block;
+      }
+      .expand-btn {
+        width: 100%;
+        border-radius: 0 !important;
+        color: #cccccc !important;
+        border-color: #3c3c3c !important;
       }
       .error {
-        color: #dc2626;
+        color: #f48771;
       }
       .props-md {
         margin: 1rem 0;
-        font-size: 0.9rem;
+        padding: 0.75rem;
+        background: #1e1e1e;
+        border: 1px solid #3c3c3c;
       }
-      code {
-        font-size: 0.75rem;
-        word-break: break-all;
+      .panel {
+        margin-top: 0.5rem;
+        border: 1px solid #3c3c3c !important;
+        box-shadow: none !important;
+      }
+      .nested {
+        margin: 0;
+        border-left: 2px solid #007fd4;
+      }
+      .chunk-body {
+        padding: 0 0.75rem 0.75rem;
+        background: #1e1e1e;
+      }
+      .edge-item {
+        color: #cccccc;
+      }
+      .edge-line {
+        font-family: Consolas, monospace;
+        font-size: 0.78rem !important;
+        color: #9d9d9d !important;
       }
     `,
   ],
@@ -125,6 +173,9 @@ export class NodeDetailSidenavComponent {
     }
     if (typeof props["name"] === "string") {
       lines.push(`**name:** ${props["name"]}`);
+    }
+    if (typeof props["title"] === "string") {
+      lines.push(`**title:** ${props["title"]}`);
     }
     if (typeof props["content"] === "string" && props["content"]) {
       lines.push("", props["content"] as string);

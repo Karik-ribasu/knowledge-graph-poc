@@ -1,0 +1,20 @@
+{
+  "opportunity_id": "opp-b4u-bet-2026-001",
+  "title": "B4U.bet — Global Sports Intelligence Hub",
+  "problem_statement": "Mercado BR/LATAM carece de plataforma premium que una mídia esportiva, IA interpretativa, dados e odds sem incentivo irresponsável ou posicionamento de casa de apostas.",
+  "market_size_estimate": {
+    "tam": 4200000000,
+    "sam": 890000000,
+    "som": 42000000,
+    "currency": "USD",
+    "confidence": 0.72,
+    "tam_methodology": "Sports media + betting intelligence + data/API addressable BR/LATAM/global export",
+    "sam_methodology": "Digital premium consumer + SMB API em BR/LATAM",
+    "som_methodology": "Year 3 realistic share: subs + qualified ads + API"
+  },
+  "deep_analysis": {
+    "target_segment_primary": "Torcedores/apostadores educados 25-44 mobile-first BR",
+    "moat_hypothesis": ["editorial+IA hybrid", "data stack", "community", "ethical governance"],
+    "analysis_quality_score": 0.86
+  }
+}

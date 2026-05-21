@@ -1,4 +1,4 @@
-import { createPool, PostgresGraphReadRepository, runMigrations } from "@kg/adapter-postgres";
+import { createPool, PostgresGraphReadRepository } from "@kg/adapter-postgres";
 import type { FastifyInstance } from "fastify";
 import type { ApiEnv } from "../lib/env.js";
 import { apiError } from "../lib/errors.js";
@@ -14,7 +14,6 @@ export async function registerNodeRoutes(
       return apiError("nodeId is required", "INVALID_PARAMS");
     }
 
-    await runMigrations("up", env.databaseUrl);
     const pool = createPool(env.databaseUrl);
     try {
       const repo = new PostgresGraphReadRepository(pool, {

@@ -1,5 +1,10 @@
 import type { GraphLinkDTO, GraphNodeDTO, GraphSnapshotDTO } from "@kg/core/explorer/schemas";
-import { edgeColor, isDashedEdge, nodeColor } from "@kg/core/explorer/graph-theme";
+import {
+  edgeColor,
+  isDashedEdge,
+  linkCurvatureForType,
+  nodeColor,
+} from "@kg/core/explorer/graph-theme";
 
 export interface ForceGraphNode {
   id: string;
@@ -20,6 +25,7 @@ export interface ForceGraphLink {
   type: string;
   color: string;
   dashed: boolean;
+  curvature: number;
 }
 
 export interface ForceGraphData {
@@ -54,5 +60,6 @@ function mapLink(l: GraphLinkDTO): ForceGraphLink {
     type: l.type,
     color: l.color ?? edgeColor(l.type),
     dashed: isDashedEdge(l.type),
+    curvature: linkCurvatureForType(l.type),
   };
 }

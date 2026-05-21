@@ -1,0 +1,27 @@
+{
+  "prioritization_id": "rank-20260520-b4u",
+  "prioritization_timestamp": "2026-05-20T14:12:00Z",
+  "ranked_opportunities": [
+    {
+      "rank": 1,
+      "opportunity_id": "opp-b4u-bet-2026-001",
+      "title": "B4U.bet — Global Sports Intelligence Hub",
+      "total_score": 82,
+      "recommendation": "advance",
+      "status": "ADVANCE",
+      "advancement_reason": "Score 82 excede threshold 75; founder brief completo; fit estratégico mídia+IA+esporte.",
+      "vertical": "sports-media-intelligence"
+    }
+  ],
+  "summary": {
+    "total_opportunities_processed": 1,
+    "total_advancing": 1,
+    "total_holding": 0,
+    "total_rejecting": 0,
+    "handoff": {
+      "module": "add-venture",
+      "workflow": "ventureStructuringWorkflow",
+      "venture_seed_name": "B4U.bet"
+    }
+  }
+}

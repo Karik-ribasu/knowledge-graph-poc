@@ -14,12 +14,13 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
     baseURL,
   },
-  webServer: process.env["CI"]
-    ? undefined
-    : {
-        command: "pnpm run start",
-        url: baseURL,
-        reuseExistingServer: true,
-        timeout: 180_000,
-      },
+  webServer:
+    process.env["CI"] || process.env["PLAYWRIGHT_SKIP_WEBSERVER"]
+      ? undefined
+      : {
+          command: "pnpm run start",
+          url: baseURL,
+          reuseExistingServer: true,
+          timeout: 180_000,
+        },
 });

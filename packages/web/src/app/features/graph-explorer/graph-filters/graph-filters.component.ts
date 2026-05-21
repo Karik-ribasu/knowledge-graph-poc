@@ -52,7 +52,7 @@ import {
         />
       </mat-form-field>
 
-      <button mat-flat-button color="primary" type="button" (click)="reload.emit()">
+      <button mat-flat-button type="button" class="reload-btn" (click)="reload.emit()">
         Recarregar grafo
       </button>
     </section>
@@ -66,9 +66,14 @@ import {
         padding: 0.75rem;
         min-width: 220px;
         max-width: 280px;
-        border-right: 1px solid var(--kg-border, #e2e8f0);
-        background: var(--kg-surface, #f8fafc);
+        background: #252526;
+        color: #cccccc;
         overflow-y: auto;
+      }
+      .reload-btn {
+        background: #007fd4 !important;
+        color: #ffffff !important;
+        border-radius: 0 !important;
       }
       .type-grid {
         display: flex;

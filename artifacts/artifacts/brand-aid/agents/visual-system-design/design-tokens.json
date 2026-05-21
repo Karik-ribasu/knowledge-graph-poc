@@ -1,0 +1,20 @@
+{
+  "brand": "B4U.bet",
+  "colors": {
+    "primary": { "name": "Pitch Deep", "hex": "#0B1220", "usage": "backgrounds" },
+    "secondary": { "name": "Signal Teal", "hex": "#14B8A6", "usage": "accent, CTAs, data highlights" },
+    "tertiary": { "name": "Insight Gold", "hex": "#F59E0B", "usage": "sparingly — key metrics only" },
+    "neutral": { "name": "Line Gray", "hex": "#94A3B8", "usage": "borders, secondary text" },
+    "surface": { "name": "Card Slate", "hex": "#1E293B", "usage": "cards" },
+    "error": { "hex": "#EF4444" },
+    "success": { "hex": "#22C55E" }
+  },
+  "typography": {
+    "display": { "family": "Instrument Sans", "fallback": "system-ui, sans-serif" },
+    "body": { "family": "Inter", "fallback": "system-ui, sans-serif" },
+    "mono": { "family": "JetBrains Mono", "usage": "stats, odds tables" }
+  },
+  "spacing_scale": "4px base",
+  "border_radius": { "sm": 6, "md": 12, "lg": 16 },
+  "accessibility": "WCAG AA minimum contrast on primary text"
+}

@@ -36,7 +36,7 @@ describe("PostgresGraphReadRepository (integration)", () => {
       });
 
       const snapshot = await graphRead.getSnapshot({
-        nodeTypes: ["Document", "Competitor", "Product"],
+        nodeTypes: ["File", "Folder", "Competitor", "Product"],
       });
       expect(snapshot.nodes.length).toBeGreaterThan(0);
       expect(snapshot.nodes.every((n) => n.val > 0 && n.color)).toBe(true);
@@ -46,13 +46,13 @@ describe("PostgresGraphReadRepository (integration)", () => {
       const expanded = await graphRead.getSnapshot({
         seed: docId,
         hops: 1,
-        nodeTypes: ["Document", "Competitor", "Product", "Chunk"],
+        nodeTypes: ["File", "Competitor", "Product", "Chunk"],
       });
       expect(expanded.nodes.some((n) => n.id === docId)).toBe(true);
 
       const detail = await graphRead.getNodeDetail(docId);
       expect(detail).not.toBeNull();
-      expect(detail?.node.type).toBe("Document");
+      expect(detail?.node.type).toBe("File");
       expect(detail?.relatedDocuments.length).toBeGreaterThan(0);
 
       const hits = await graphRead.searchNodes("competidor", 5);

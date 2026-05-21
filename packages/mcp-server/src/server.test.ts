@@ -22,13 +22,14 @@ describe("Knowledge Graph MCP server (in-process)", () => {
     await client.close();
   });
 
-  it("lists six kg_* tools", async () => {
+  it("lists seven kg_* tools", async () => {
     const { tools } = await client.listTools();
     const names = tools.map((t) => t.name).sort();
     expect(names).toEqual([
       "kg_expand",
       "kg_index",
       "kg_ingest",
+      "kg_ingest_artifacts",
       "kg_pack",
       "kg_search",
       "kg_stats",

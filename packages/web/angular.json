@@ -30,10 +30,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.scss"
-            ],
+            "styles": ["src/styles.scss"],
             "allowedCommonJsDependencies": [
               "force-graph",
               "d3-force",

@@ -1,8 +1,19 @@
 import { createHash } from "node:crypto";
 
-/** Stable document id from workspace-relative path. */
+/** Stable document / file node id from workspace-relative path. */
 export function docIdFromPath(relativePath: string): string {
   return createHash("sha256").update(relativePath).digest("hex").slice(0, 16);
+}
+
+/** Stable artifact id from workspace-relative path under artifacts/artifacts. */
+export function artifactIdFromPath(relativePath: string): string {
+  return createHash("sha256").update(`artifact:${relativePath}`).digest("hex").slice(0, 16);
+}
+
+/** Stable folder node id from workspace-relative directory path. */
+export function folderIdFromPath(dirPath: string): string {
+  const key = dirPath.length === 0 ? "__root__" : dirPath;
+  return createHash("sha256").update(`folder:${key}`).digest("hex").slice(0, 16);
 }
 
 export function sectionIdFromParts(docId: string, heading: string, ordinal: number): string {

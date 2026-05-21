@@ -1,0 +1,30 @@
+{
+  "venture_id": "v-b4u-bet-001",
+  "selected_name": "B4U.bet",
+  "selection_rationale": "Memorável, BR-friendly pronunciation ('Bê 4 U'), domínio .bet comunica categoria sem parecer operador. 'B4U' = 'before you' / inteligência antes da decisão.",
+  "shortlist": [
+    {
+      "name": "B4U.bet",
+      "score": 92,
+      "domain_available": "assumed_premium",
+      "risks": ["Associação .bet — mitigar com tagline intelligence-first"]
+    },
+    {
+      "name": "Apito Inteligente",
+      "score": 71,
+      "domain_available": "unknown",
+      "risks": ["Menos global, mais narrow football"]
+    },
+    {
+      "name": "SportGraph BR",
+      "score": 68,
+      "domain_available": "moderate",
+      "risks": ["Soa B2B, menos consumer premium"]
+    }
+  ],
+  "taglines": [
+    "Inteligência antes do apito.",
+    "Intelligence before the whistle.",
+    "Sports intelligence, not betting noise."
+  ]
+}

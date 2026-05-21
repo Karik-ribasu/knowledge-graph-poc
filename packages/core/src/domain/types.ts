@@ -45,6 +45,8 @@ export interface ChunkRecord {
   text: string;
   tokenCount: number;
   path: string;
+  startLine: number;
+  endLine: number;
 }
 
 export interface SectionRecord {

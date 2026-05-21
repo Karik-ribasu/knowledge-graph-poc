@@ -5,6 +5,7 @@ import {
   runExpandUseCase,
   runIndexUseCase,
   runIngestUseCase,
+  runIngestArtifactsUseCase,
   runPackUseCase,
   runSearchUseCase,
 } from "./wiring.js";
@@ -15,14 +16,16 @@ function printHelp(): void {
 
 Usage:
   kg ingest [path]              Ingest markdown corpus (updates lexical tsvector)
+  kg ingest-artifacts [path]    Ingest delivery artifacts (default: artifacts/artifacts)
   kg index [options]            Embed chunks and store in pgvector
   kg search <query> [options]   Hybrid search (dense + BM25 + RRF)
   kg expand --from <seed>       Graph expansion from doc/entity (1-2 hops)
-  kg pack [options]             Build ContextPack from brief JSON
+  kg pack [options]             Build ContextPack from brief JSON (default: artifacts only)
   kg --help                     Show this help
 
 Options (pack):
   --brief <path|->              Brief JSON file, or "-" / omit for stdin
+  --corpus                      Include legacy corpus/ paths (default: artifacts/artifacts only)
 
 Options (expand):
   --from <doc:id|entity:Type:slug>   Seed node (required)
@@ -36,6 +39,7 @@ Options (index / search):
 
 Options (search):
   --doc-type <business|market|technical>   Filter by document type
+  --module <opportunity|add-venture|brand-aid>   Filter artifact paths by module (repeatable)
 
 Environment:
   DATABASE_URL       PostgreSQL connection string
@@ -98,6 +102,24 @@ async function main(): Promise<void> {
       process.exit(0);
     }
 
+    if (command === "ingest-artifacts") {
+      const { workspaceRoot, artifactsDir, stats } = await runIngestArtifactsUseCase(arg);
+      console.log(
+        JSON.stringify(
+          {
+            ok: true,
+            workspaceRoot,
+            artifactsDir,
+            lexicalIndex: "updated on chunk upsert",
+            ...stats,
+          },
+          null,
+          2,
+        ),
+      );
+      process.exit(0);
+    }
+
     if (command === "index") {
       const result = await runIndexUseCase(readFlag(rest, "--provider"));
       console.log(JSON.stringify({ ok: true, ...result }, null, 2));
@@ -108,8 +130,10 @@ async function main(): Promise<void> {
       if (!arg) {
         throw new Error('Usage: kg search "<query>" [--doc-type market] [--provider hash]');
       }
+      const moduleFlags = rest.filter((_v, i) => rest[i - 1] === "--module");
       const result = await runSearchUseCase(arg, {
         docType: readFlag(rest, "--doc-type"),
+        module: moduleFlags.length > 0 ? moduleFlags : undefined,
         providerName: readFlag(rest, "--provider"),
       });
       console.log(JSON.stringify({ ok: true, ...result, count: result.results.length }, null, 2));
@@ -130,7 +154,10 @@ async function main(): Promise<void> {
 
     if (command === "pack") {
       const brief = await loadBrief(argv.slice(1));
-      const { pack, meta } = await runPackUseCase(brief, readFlag(argv.slice(1), "--provider"));
+      const useCorpus = argv.slice(1).includes("--corpus");
+      const { pack, meta } = await runPackUseCase(brief, readFlag(argv.slice(1), "--provider"), {
+        artifactsOnly: !useCorpus,
+      });
       console.log(JSON.stringify({ ok: true, ...meta, pack }, null, 2));
       process.exit(0);
     }

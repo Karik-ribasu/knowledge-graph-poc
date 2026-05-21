@@ -21,6 +21,16 @@ export class PostgresSearchStore implements SearchStore {
       filterSql = ` AND d.doc_type = $${String(params.length)}`;
     }
 
+    if (filters?.module && filters.module.length > 0) {
+      params.push(filters.module);
+      filterSql += ` AND split_part(d.path, '/', 3) = ANY($${String(params.length)}::text[])`;
+    }
+
+    if (filters?.pathPrefix) {
+      params.push(`${filters.pathPrefix}%`);
+      filterSql += ` AND d.path LIKE $${String(params.length)}`;
+    }
+
     const result = await this.pool.query<{
       chunk_id: string;
       doc_id: string;
@@ -61,6 +71,16 @@ export class PostgresSearchStore implements SearchStore {
     if (filters?.docType) {
       params.push(filters.docType);
       filterSql = ` AND d.doc_type = $${String(params.length)}`;
+    }
+
+    if (filters?.module && filters.module.length > 0) {
+      params.push(filters.module);
+      filterSql += ` AND split_part(d.path, '/', 3) = ANY($${String(params.length)}::text[])`;
+    }
+
+    if (filters?.pathPrefix) {
+      params.push(`${filters.pathPrefix}%`);
+      filterSql += ` AND d.path LIKE $${String(params.length)}`;
     }
 
     const result = await this.pool.query<{

@@ -1,0 +1,13 @@
+{
+  "product": "B4U.bet — hub de inteligência esportiva (mídia premium + dados + IA interpretativa). Não é casa de apostas nem tipster.",
+  "audience": "Torcedores e apostadores 25-44 BR mobile-first — Intelligence Seekers",
+  "goal": "Conversão para waitlist / assinatura premium — CTA principal acima da dobra",
+  "tone": "Confiante, editorial, transparente sobre IA e jogo responsável; anti-clickbait",
+  "locale": "pt-BR",
+  "constraints": [
+    "Não prometer resultado de apostas",
+    "Separar editorial de monetização de afiliados",
+    "Incluir âncora de jogo responsável no footer",
+    "Usar design tokens brand-aid (#0B1220, #14B8A6)"
+  ]
+}

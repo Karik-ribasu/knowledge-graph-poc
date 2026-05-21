@@ -14,3 +14,4 @@ export {
 } from "./repositories/search-repository.js";
 export { PostgresGraphExpansionStore } from "./repositories/graph-expansion-repository.js";
 export { PostgresGraphReadRepository } from "./repositories/graph-read-repository.js";
+export { PostgresCorpusReadRepository } from "./repositories/corpus-read-repository.js";

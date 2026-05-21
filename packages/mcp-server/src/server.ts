@@ -6,7 +6,9 @@ import {
   resolveWorkspaceRoot,
   runExpandUseCase,
   runIndexUseCase,
+  resolveArtifactsDir,
   runIngestUseCase,
+  runIngestArtifactsUseCase,
   runPackUseCase,
   runSearchUseCase,
   runStatsUseCase,
@@ -21,6 +23,7 @@ export const MCP_SERVER_NAME = "knowledge-graph-poc";
 export const MCP_SERVER_VERSION = "0.1.0";
 
 const docTypeSchema = z.enum(["business", "market", "technical"]);
+const moduleSchema = z.enum(["opportunity", "add-venture", "brand-aid"]);
 const providerSchema = z.enum(["hash", "transformers", "openai"]).optional();
 
 function jsonText(data: unknown) {
@@ -65,6 +68,32 @@ export function createKnowledgeGraphMcpServer(): McpServer {
   );
 
   server.registerTool(
+    "kg_ingest_artifacts",
+    {
+      description:
+        "Ingest delivery artifacts (JSON, volumes, images) into Postgres graph + lexical chunks. Path must stay under KG_WORKSPACE.",
+      inputSchema: {
+        path: z
+          .string()
+          .optional()
+          .describe("Artifacts directory relative to KG_WORKSPACE (default: artifacts/artifacts)"),
+      },
+    },
+    async ({ path }) => {
+      const workspaceRoot = resolveWorkspaceRoot();
+      const artifactsDir = resolveArtifactsDir(workspaceRoot, path);
+      const { stats } = await runIngestArtifactsUseCase(path);
+      return jsonText({
+        ok: true,
+        workspaceRoot,
+        artifactsDir,
+        lexicalIndex: "updated on chunk upsert",
+        ...stats,
+      });
+    },
+  );
+
+  server.registerTool(
     "kg_index",
     {
       description: "Embed unindexed chunks and store vectors in pgvector.",
@@ -87,6 +116,7 @@ export function createKnowledgeGraphMcpServer(): McpServer {
         filters: z
           .object({
             doc_type: z.array(docTypeSchema).optional(),
+            module: z.array(moduleSchema).optional(),
           })
           .optional(),
         limit: z.number().int().min(1).max(50).optional().describe("Max results (default 20)"),
@@ -95,8 +125,10 @@ export function createKnowledgeGraphMcpServer(): McpServer {
     },
     async ({ query, filters, limit, provider }) => {
       const docType = filters?.doc_type?.[0];
+      const module = filters?.module;
       const result = await runSearchUseCase(query, {
         docType,
+        module,
         providerName: provider,
         limit: limit ?? 20,
       });
@@ -147,11 +179,22 @@ export function createKnowledgeGraphMcpServer(): McpServer {
           })
           .describe("Landing brief (see docs/06-fluxo-landing-page.md)"),
         provider: providerSchema,
+        artifacts_only: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe("When true (default), pack uses only artifacts/artifacts/ delivery files"),
+        corpus: z
+          .boolean()
+          .optional()
+          .describe("When true, include legacy corpus/ (overrides artifacts_only)"),
       },
     },
-    async ({ brief, provider }) => {
+    async ({ brief, provider, artifacts_only, corpus }) => {
       const parsedBrief = await loadBriefFromJson(brief);
-      const { pack, meta } = await runPackUseCase(parsedBrief, provider);
+      const { pack, meta } = await runPackUseCase(parsedBrief, provider, {
+        artifactsOnly: corpus ? false : (artifacts_only ?? true),
+      });
       return jsonText({ ok: true, ...meta, pack });
     },
   );

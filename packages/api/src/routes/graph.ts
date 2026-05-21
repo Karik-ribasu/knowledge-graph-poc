@@ -1,8 +1,22 @@
-import { createPool, PostgresGraphReadRepository, runMigrations } from "@kg/adapter-postgres";
+import { createPool, PostgresGraphReadRepository } from "@kg/adapter-postgres";
 import { graphQuerySchema } from "@kg/core";
+import type { z } from "zod";
 import type { FastifyInstance } from "fastify";
 import type { ApiEnv } from "../lib/env.js";
 import { apiError } from "../lib/errors.js";
+
+type GraphQuery = z.infer<typeof graphQuerySchema>;
+
+function resolveHighlightPreset(q: GraphQuery): GraphQuery & { limit?: number } {
+  if (!q.highlightMode || !q.seed) return q;
+  if (q.highlightMode === "fileNeighborhood") {
+    return { ...q, hops: q.hops ?? 1, limit: q.limit ?? 120 };
+  }
+  if (q.highlightMode === "chunkNeighborhood") {
+    return { ...q, hops: q.hops ?? 1, limit: q.limit ?? 80 };
+  }
+  return q;
+}
 
 export async function registerGraphRoutes(
   app: FastifyInstance,
@@ -16,10 +30,10 @@ export async function registerGraphRoutes(
     }
 
     const q = parsed.data;
-    const maxNodes = Math.min(q.limit ?? env.graphMaxNodes, env.graphMaxNodes);
+    const preset = resolveHighlightPreset(q);
+    const maxNodes = Math.min(preset.limit ?? env.graphMaxNodes, env.graphMaxNodes);
     const maxEdges = env.graphMaxEdges;
 
-    await runMigrations("up", env.databaseUrl);
     const pool = createPool(env.databaseUrl);
     try {
       const repo = new PostgresGraphReadRepository(pool, {
@@ -27,10 +41,10 @@ export async function registerGraphRoutes(
         maxEdges: env.graphMaxEdges,
       });
       const snapshot = await repo.getSnapshot({
-        seed: q.seed,
-        hops: q.hops,
-        nodeTypes: q.nodeTypes,
-        docType: q.docType,
+        seed: preset.seed,
+        hops: preset.hops,
+        nodeTypes: preset.nodeTypes,
+        docType: preset.docType,
         maxNodes,
         maxEdges,
       });

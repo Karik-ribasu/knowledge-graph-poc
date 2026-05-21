@@ -4,6 +4,7 @@ import type { GraphExpansionStore } from "../graph/graph-expansion.js";
 import type { SearchStore } from "../ports/search-store.js";
 import { buildContextPack } from "./pack-builder.js";
 import type { Brief } from "./schema.js";
+import { PACK_SECTION_IDS } from "./sections.js";
 const brief: Brief = {
   product: "NexusFlow",
   audience: "Revenue Ops",
@@ -73,6 +74,7 @@ describe("PackBuilder", () => {
       searchStore: store,
       tokenBudget: 4000,
       hitsPerQuery: 5,
+      artifactsOnly: false,
     });
 
     expect(pack.brief.product).toBe("NexusFlow");
@@ -116,6 +118,7 @@ describe("PackBuilder", () => {
       embeddingProvider: new HashEmbeddingProvider(),
       searchStore: store,
       tokenBudget: 8000,
+      artifactsOnly: false,
     });
 
     const pricingPaths = pack.sections.pricing.chunks.map((c) => c.path);
@@ -173,11 +176,53 @@ describe("PackBuilder", () => {
       embeddingProvider: new HashEmbeddingProvider(),
       searchStore: store,
       graphExpansion: expansion,
+      artifactsOnly: false,
     });
 
     expect(expansion.expand).toHaveBeenCalledTimes(1);
     expect(pack.meta.duration_ms).toBeGreaterThanOrEqual(0);
   });
-});
 
-import { PACK_SECTION_IDS } from "./sections.js";
+  it("artifactsOnly excludes corpus paths", async () => {
+    const store = mockSearchStore({
+      tagline: [
+        {
+          chunkId: "art-1",
+          docId: "a1",
+          path: "artifacts/artifacts/add-venture/agents/value-proposition-designer/vol-3-value-proposition.md",
+          heading: "Tagline",
+          text: "Inteligência antes do apito.",
+        },
+        {
+          chunkId: "corpus-1",
+          docId: "c1",
+          path: "corpus/business/visao.md",
+          heading: "Hero",
+          text: "NexusFlow headline",
+        },
+      ],
+    });
+
+    const b4uBrief: Brief = {
+      product: "B4U.bet",
+      audience: "Torcedores BR",
+      goal: "Waitlist",
+      tone: "Editorial",
+      constraints: [],
+      locale: "pt-BR",
+    };
+
+    const pack = await buildContextPack({
+      brief: b4uBrief,
+      embeddingProvider: new HashEmbeddingProvider(),
+      searchStore: store,
+      tokenBudget: 4000,
+      artifactsOnly: true,
+    });
+
+    expect(pack.meta.source).toBe("artifacts");
+    const paths = pack.sections.hero.chunks.map((c) => c.path);
+    expect(paths.every((p) => p.startsWith("artifacts/artifacts/"))).toBe(true);
+    expect(paths.some((p) => p.includes("corpus/"))).toBe(false);
+  });
+});
